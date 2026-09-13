@@ -70,7 +70,7 @@ Foreman does not:
 - Agent adapters initially support Claude Code, Codex CLI, Gemini CLI, OpenCode, and Pi.
 - Runtime adapters initially support tmux and Herdr.
 - GitHub and GitLab, including supported self-hosted GitLab instances, are optional remote adapters.
-- FirstMate provenance remains auditable through the pinned baseline, license notice, upstream map, and ongoing intake records.
+- FirstMate source use remains auditable through the pinned reference, upstream map, ongoing intake records, and any attribution required when source material is incorporated.
 
 ## Definition of success
 

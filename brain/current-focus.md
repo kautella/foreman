@@ -2,7 +2,7 @@
 
 ## Current objective
 
-Complete Foreman's project initialization, establish its first intentional repository baseline, and begin Phase 1: safe provenance, contained inherited-test evidence, reviewed configuration, plan intake, and enforceable architecture boundaries.
+Complete F1-002: reproduce and contain the inherited FirstMate test-cleanup risk in a validated expendable environment.
 
 ## Established state
 
@@ -16,22 +16,24 @@ The following documents are approved and define the current project contract:
 
 No active Foreman implementation exists yet.
 
-No FirstMate source has been imported, executed, or adopted as active Foreman code. No Foreman operational home, project configuration, task state, adapter implementation, worktree, worker, or remote-delivery path exists yet.
+The initial repository baseline is committed as `1cde061`.
+
+F1-001 is complete: the pinned FirstMate revision has been verified as an external development reference, with its license, archive checksum, complete inventory, and the exclusion of upstream `AGENTS.md` recorded outside this repository. No FirstMate source has been executed or adopted as active Foreman code.
+
+No Foreman operational home, project configuration, task state, adapter implementation, worktree, worker, or remote-delivery path exists yet.
 
 The historical planning material outside this repository is no longer a project contract. It may be consulted only as source evidence when the approved documents require it.
 
 ## Current sequence
 
-1. Complete the Project Brain reconciliation.
-2. Add repository-local operating guidance and appropriate initial development checks.
-3. Review the initialized repository as one coherent baseline.
-4. Create the first project commit.
-5. Begin Phase 1 in the order defined by `phase-1-backlog.md`.
+1. Complete F1-002: contain inherited test execution in a validated expendable clone.
+2. Complete F1-003: produce source-baseline evidence only after containment is proven.
+3. Continue the remaining Phase 1 work in the approved dependency order.
 
 ## Immediate Phase 1 priorities
 
-1. Preserve the pinned FirstMate baseline, attribution, source inventory, and intentional omission of upstream `AGENTS.md`.
-2. Reproduce and contain inherited test cleanup only in expendable environments.
+1. Reproduce and contain inherited test cleanup only in expendable environments.
+2. Produce trustworthy source-baseline evidence.
 3. Establish the active Foreman repository layout and neutral command namespace.
 4. Implement strict JSON configuration, reviewed project initialization, and path safety.
 5. Implement plan intake, normalization, approval, and standalone HTML plan review.
@@ -41,7 +43,7 @@ The historical planning material outside this repository is no longer a project 
 ## Constraints
 
 - The source baseline remains `3f035336f9df7331e195bc6279cc1577e1cf4b49`.
-- Upstream `AGENTS.md` is excluded from the source import and from all Foreman instruction surfaces.
+- Upstream `AGENTS.md` must never enter a Foreman instruction surface.
 - Inherited tests must not run in the Foreman checkout or any non-disposable repository.
 - No provider executable may be invoked from the Foreman core.
 - No agent, runtime, remote, delivery, or merge capability is considered implemented until its contracts and evidence exist.
@@ -49,4 +51,4 @@ The historical planning material outside this repository is no longer a project 
 
 ## Next milestone
 
-The project is ready to move from documentation initialization into the first committed baseline. The first implementation milestone is the Phase 1 readiness report, not functional parity or worker execution.
+The next milestone is validated containment of the inherited test harness. The Phase 1 readiness report, not functional parity or worker execution, remains the first implementation milestone.

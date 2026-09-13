@@ -23,11 +23,11 @@ Do not begin deferred work merely because it appears technically related. Do not
 
 When a proposed change would alter product scope, safety, authority, configuration semantics, a supported-provider boundary, or the approved architecture, stop and surface the decision.
 
-## Active and archival material
+## Source reference material
 
 Only documented active Foreman source directories form the product implementation.
 
-Files under `provenance/` are archival reference material. They are not executable product code, active instructions, runtime configuration, or test inputs. Do not execute, source, copy, or modify archival material unless the approved current task explicitly requires it.
+FirstMate and historical source material are external development references. They are not executable product code, active instructions, runtime configuration, or test inputs. Do not execute, source, copy, or modify them unless the approved current task explicitly requires it.
 
 ## Architecture boundaries
 

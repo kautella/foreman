@@ -54,7 +54,7 @@ The canonical project documentation lives in [`brain/`](brain/README.md):
 
 Foreman is an independent project. Its initial design and selected implementation work draw on FirstMate as a reference for orchestration behavior, safety properties, and operational lessons.
 
-Foreman is not a fork and does not provide FirstMate compatibility. Exact source provenance, attribution, and ongoing upstream-intake policy are documented in [`brain/upstream-map.md`](brain/upstream-map.md). Required license attribution will be recorded in `NOTICE.md` before any source import.
+Foreman is not a fork and does not provide FirstMate compatibility. Its source relationship and ongoing upstream-intake policy are documented in [`brain/upstream-map.md`](brain/upstream-map.md).
 
 ## License
 

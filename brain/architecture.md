@@ -348,7 +348,7 @@ Live tests are opt-in for local development and required as release evidence for
 
 ## Provenance and evolution
 
-Foreman is an independent MIT-licensed project that may import and adapt FirstMate code from a pinned baseline. Attribution remains auditable through `LICENSE`, `NOTICE.md`, and `upstream-map.md`.
+Foreman is an independent MIT-licensed project that may import and adapt selected FirstMate code from a pinned external reference. Attribution remains auditable through `LICENSE`, `upstream-map.md`, and any notices required when source material is incorporated.
 
 FirstMate behavior is preserved only when it supports Foreman's approved product requirements. No FirstMate state, command, vocabulary, persona, configuration, or compatibility promise enters the target architecture.
 
