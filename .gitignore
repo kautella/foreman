@@ -1,0 +1,10 @@
+# IDEs and editors: local workspace metadata
+.idea/
+.vscode/
+.vs/
+.fleet/
+.zed/
+*.iml
+
+# Operating system metadata
+.DS_Store
