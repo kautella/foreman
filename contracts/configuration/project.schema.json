@@ -1,0 +1,293 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foreman.local/contracts/configuration/project.schema.json",
+  "title": "Foreman project configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project",
+    "worktree_root",
+    "remote",
+    "worker_profile",
+    "runtime",
+    "delivery",
+    "validation"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "slug",
+        "repository_path",
+        "git_common_dir"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "repository_path": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "git_common_dir": {
+          "type": "string",
+          "pattern": "^/"
+        }
+      }
+    },
+    "worktree_root": {
+      "type": "string",
+      "pattern": "^/"
+    },
+    "remote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "name",
+        "url",
+        "host",
+        "repository"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": [
+            "none",
+            "github",
+            "gitlab",
+            "unsupported"
+          ]
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "host": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "repository": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "provider": {
+                "const": "none"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "name": {
+                "type": "null"
+              },
+              "url": {
+                "type": "null"
+              },
+              "host": {
+                "type": "null"
+              },
+              "repository": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "provider": {
+                "enum": [
+                  "github",
+                  "gitlab"
+                ]
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "url": {
+                "type": "string",
+                "minLength": 1
+              },
+              "host": {
+                "type": "string",
+                "minLength": 1
+              },
+              "repository": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "worker_profile": {
+      "$ref": "worker-profile.schema.json"
+    },
+    "runtime": {
+      "type": "string",
+      "enum": [
+        "tmux",
+        "herdr"
+      ]
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy",
+        "merge_authority"
+      ],
+      "properties": {
+        "policy": {
+          "type": "string",
+          "enum": [
+            "draft-handoff",
+            "automated-change-request"
+          ]
+        },
+        "merge_authority": {
+          "type": "boolean"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "commands",
+        "require_clean_worktree"
+      ],
+      "properties": {
+        "commands": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "require_clean_worktree": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "remote": {
+            "properties": {
+              "provider": {
+                "enum": [
+                  "none",
+                  "unsupported"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "delivery": {
+            "properties": {
+              "policy": {
+                "const": "draft-handoff"
+              },
+              "merge_authority": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "delivery": {
+            "properties": {
+              "policy": {
+                "const": "automated-change-request"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "remote": {
+            "properties": {
+              "provider": {
+                "enum": [
+                  "github",
+                  "gitlab"
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "delivery": {
+            "properties": {
+              "merge_authority": {
+                "const": true
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "delivery": {
+            "properties": {
+              "policy": {
+                "const": "automated-change-request"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

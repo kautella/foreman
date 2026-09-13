@@ -30,6 +30,9 @@ The active Foreman product skeleton exists with a neutral command surface, appro
 - Completed F1-004: established the active `bin/`, `lib/`, `contracts/`, `adapters/`, `rendering/`, `tests/`, and `docs/` layout.
 - Added the neutral `foreman` command with stable help, version output, clear refusal of unknown commands, and no inherited executable or compatibility path.
 - Added a portable Foreman-owned test runner and initial command-surface tests.
+- Completed F1-005: added strict versioned JSON schemas and runtime validation for global configuration, project configuration, and worker profiles.
+- Configuration now requires canonical project and worktree paths, Git identity, explicit agent/model/reasoning selection, runtime, delivery policy, merge authority, and validation requirements.
+- Contract checks reject unknown fields, unsupported agent identities, duplicate validation commands, and remote delivery or merge authority for local-only projects.
 
 ## Not started
 

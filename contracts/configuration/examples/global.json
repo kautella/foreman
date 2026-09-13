@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "projects_root": "/home/user/.foreman/projects",
+  "defaults": {
+    "worker_profile": null,
+    "runtime": null,
+    "worktree_root": null,
+    "delivery_policy": "draft-handoff",
+    "merge_authority": false
+  }
+}

@@ -2,7 +2,7 @@
 
 ## Current objective
 
-Complete F1-003 and F1-005: finish the contained source baseline and define Foreman's strict configuration contracts.
+Complete F1-003 and F1-006: finish the contained source baseline and implement reviewed project initialization and diagnostics.
 
 ## Established state
 
@@ -29,7 +29,7 @@ The historical planning material outside this repository is no longer a project 
 ## Current sequence
 
 1. Complete F1-003: produce source-baseline evidence through the validated disposable-repository harness.
-2. Define the global and project configuration contracts.
+2. Implement reviewed initialization against the global and project configuration contracts.
 3. Continue the remaining Phase 1 work in the approved dependency order.
 
 ## Immediate Phase 1 priorities
