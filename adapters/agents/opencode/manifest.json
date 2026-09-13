@@ -1,0 +1,11 @@
+{
+  "contract_version": 1,
+  "kind": "agent",
+  "id": "opencode",
+  "display_name": "OpenCode",
+  "executable": "opencode",
+  "status": "contract-only",
+  "operations": ["diagnose", "validate-profile", "launch", "resume", "inspect", "interrupt"],
+  "capabilities": {"model_selection": true, "reasoning_selection": true, "resume": true},
+  "profile": {"model_required": true, "reasoning_required": true, "validation": "provider-adapter"}
+}

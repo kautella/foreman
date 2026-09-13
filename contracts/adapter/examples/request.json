@@ -1,0 +1,10 @@
+{
+  "contract_version": 1,
+  "request_id": "request-01",
+  "adapter": {
+    "kind": "runtime",
+    "id": "tmux"
+  },
+  "operation": "diagnose",
+  "payload": {}
+}

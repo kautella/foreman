@@ -8,6 +8,8 @@
 . "$FOREMAN_SOURCE_ROOT/lib/foreman/projects/remote.sh"
 # shellcheck source=lib/foreman/configuration/validate.sh
 . "$FOREMAN_SOURCE_ROOT/lib/foreman/configuration/validate.sh"
+# shellcheck source=lib/foreman/adapters/registry.sh
+. "$FOREMAN_SOURCE_ROOT/lib/foreman/adapters/registry.sh"
 
 foreman_init_usage() {
   cat <<'EOF'
@@ -198,6 +200,10 @@ foreman_init_command() {
   [ -n "$reasoning" ] || reasoning=$(foreman_init_prompt_required 'Reasoning or effort') || return 1
   [ -n "$runtime" ] || runtime=$default_runtime
   [ -n "$runtime" ] || runtime=$(foreman_init_prompt_required 'Runtime adapter') || return 1
+  foreman_adapter_validate_profile "$agent" "$model" "$reasoning" || return 1
+  foreman_adapter_require runtime "$runtime" >/dev/null || return 1
+  foreman_adapter_require_available agent "$agent" || return 1
+  foreman_adapter_require_available runtime "$runtime" || return 1
 
   project_root=$(foreman_path_canonicalize "$projects_root/$slug") || return 1
   if [ -n "$worktree_input" ]; then
@@ -234,6 +240,10 @@ foreman_init_command() {
   if [ "$merge_authority" = true ] && [ "$delivery_policy" != automated-change-request ]; then
     foreman_init_die 'merge authority requires automated-change-request delivery'
     return 1
+  fi
+  if [ "$delivery_policy" = automated-change-request ]; then
+    foreman_adapter_require remote "$FOREMAN_REMOTE_PROVIDER" >/dev/null || return 1
+    foreman_adapter_require_available remote "$FOREMAN_REMOTE_PROVIDER" || return 1
   fi
 
   if [ "${#validation_commands[@]}" -eq 0 ] && [ -x "$repository/scripts/check.sh" ]; then

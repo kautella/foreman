@@ -1,0 +1,11 @@
+{
+  "contract_version": 1,
+  "kind": "remote",
+  "id": "github",
+  "display_name": "GitHub",
+  "executable": "gh",
+  "status": "contract-only",
+  "operations": ["detect", "diagnose", "create-change-request", "observe-change-request", "observe-checks", "merge", "observe-landing"],
+  "capabilities": {"draft_handoff": true, "automated_change_request": true, "merge": true},
+  "profile": null
+}

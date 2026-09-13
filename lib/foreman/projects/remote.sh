@@ -6,6 +6,26 @@ FOREMAN_REMOTE_URL=
 FOREMAN_REMOTE_HOST=
 FOREMAN_REMOTE_REPOSITORY=
 
+foreman_remote_provider_for_host() {
+  local host=$1 manifest provider matcher matched=
+
+  for manifest in "$FOREMAN_SOURCE_ROOT"/adapters/remotes/*/manifest.json; do
+    [ -f "$manifest" ] || continue
+    provider=$(jq -r '.id' "$manifest")
+    matcher=${manifest%/manifest.json}/match-host.sh
+    [ -x "$matcher" ] || continue
+    if "$matcher" "$host"; then
+      [ -z "$matched" ] || {
+        printf 'foreman: multiple remote adapters matched host: %s\n' "$host" >&2
+        return 1
+      }
+      matched=$provider
+    fi
+  done
+  [ -n "$matched" ] || return 1
+  printf '%s\n' "$matched"
+}
+
 foreman_remote_parse_url() {
   local url=$1 remainder authority
 
@@ -74,18 +94,11 @@ foreman_remote_detect() {
     return 0
   fi
 
-  case "$provider_override" in
-    github|gitlab) FOREMAN_REMOTE_PROVIDER=$provider_override ;;
-    '')
-      case "$FOREMAN_REMOTE_HOST" in
-        github.com|www.github.com) FOREMAN_REMOTE_PROVIDER=github ;;
-        gitlab.com|www.gitlab.com) FOREMAN_REMOTE_PROVIDER=gitlab ;;
-        *) FOREMAN_REMOTE_PROVIDER=unsupported ;;
-      esac
-      ;;
-    *)
-      printf 'foreman: --remote-provider must be github or gitlab\n' >&2
-      return 1
-      ;;
-  esac
+  if [ -n "$provider_override" ]; then
+    foreman_adapter_require remote "$provider_override" >/dev/null || return 1
+    FOREMAN_REMOTE_PROVIDER=$provider_override
+  else
+    FOREMAN_REMOTE_PROVIDER=$(foreman_remote_provider_for_host "$FOREMAN_REMOTE_HOST") \
+      || FOREMAN_REMOTE_PROVIDER=unsupported
+  fi
 }

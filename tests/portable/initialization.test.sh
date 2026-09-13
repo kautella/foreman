@@ -9,6 +9,14 @@ foreman="$repo_root/bin/foreman"
 
 test_root=$(mktemp -d '/tmp/foreman-initialization.XXXXXX') || exit 1
 trap 'rm -rf "$test_root"' EXIT HUP INT TERM
+fakebin="$test_root/fakebin"
+mkdir -p "$fakebin"
+for executable in codex herdr gh; do
+  printf '#!/usr/bin/env bash\nexit 0\n' >"$fakebin/$executable"
+  chmod +x "$fakebin/$executable"
+done
+PATH="$fakebin:$PATH"
+export PATH
 
 create_repository() {
   local path=$1

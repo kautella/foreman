@@ -1,0 +1,11 @@
+{
+  "contract_version": 1,
+  "kind": "runtime",
+  "id": "herdr",
+  "display_name": "Herdr",
+  "executable": "herdr",
+  "status": "contract-only",
+  "operations": ["diagnose", "create", "inspect", "send", "capture", "wait", "close", "enumerate"],
+  "capabilities": {"events": true, "bounded_polling": true, "literal_input": true},
+  "profile": null
+}

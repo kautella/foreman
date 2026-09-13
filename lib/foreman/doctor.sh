@@ -4,6 +4,8 @@
 . "$FOREMAN_SOURCE_ROOT/lib/foreman/path.sh"
 # shellcheck source=lib/foreman/configuration/validate.sh
 . "$FOREMAN_SOURCE_ROOT/lib/foreman/configuration/validate.sh"
+# shellcheck source=lib/foreman/adapters/registry.sh
+. "$FOREMAN_SOURCE_ROOT/lib/foreman/adapters/registry.sh"
 
 foreman_doctor_check_command() {
   local command=$1
@@ -18,6 +20,7 @@ foreman_doctor_check_command() {
 foreman_doctor_command() {
   local home requested_project= status=0 global project_file projects_root expected_projects_root
   local repository stored_repository git_common_dir stored_git_common_dir worktree_root stored_worktree_root stored_slug
+  local agent runtime delivery_policy remote_provider
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -106,6 +109,28 @@ foreman_doctor_command() {
       status=1
     else
       printf 'ok    project configuration and identity are valid: %s\n' "$requested_project"
+    fi
+
+    agent=$(jq -r '.worker_profile.agent' "$project_file")
+    runtime=$(jq -r '.runtime' "$project_file")
+    delivery_policy=$(jq -r '.delivery.policy' "$project_file")
+    remote_provider=$(jq -r '.remote.provider' "$project_file")
+    if foreman_adapter_require_available agent "$agent"; then
+      printf 'ok    configured agent adapter is available: %s\n' "$agent"
+    else
+      status=1
+    fi
+    if foreman_adapter_require_available runtime "$runtime"; then
+      printf 'ok    configured runtime adapter is available: %s\n' "$runtime"
+    else
+      status=1
+    fi
+    if [ "$delivery_policy" = automated-change-request ]; then
+      if foreman_adapter_require_available remote "$remote_provider"; then
+        printf 'ok    configured remote adapter is available: %s\n' "$remote_provider"
+      else
+        status=1
+      fi
     fi
   fi
 

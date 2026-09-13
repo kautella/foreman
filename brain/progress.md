@@ -38,6 +38,11 @@ The active Foreman product skeleton exists with a neutral command surface, appro
 - Added `foreman doctor` for core prerequisite, global configuration, project configuration, and live repository-identity diagnostics.
 - Completed the F1-007 path and state foundation: canonical absolute paths, non-overlapping home/project/worktree/Git roots, direct symbolic-link refusal, unique repository registration, atomic private configuration writes, and fail-closed malformed or unsupported configuration.
 - Verified that rejected or incomplete initialization creates no Foreman home and that remote detection does not mutate repository configuration.
+- Completed F1-006: initialization now validates configured agent and runtime identities, required profile capabilities, and executable availability through adapter-owned manifests; automated remote delivery additionally requires an available remote adapter.
+- Completed F1-010: added strict versioned manifests for the five approved agents, two runtimes, and two remotes, plus normalized adapter request and result contracts.
+- Adapter contract validation rejects unknown identities, undeclared operations, malformed or contradictory results, and diagnostic-free failures.
+- Public remote host matching now lives inside the applicable remote adapter boundary. Self-hosted GitLab selection remains an explicit initialization choice.
+- Adapter manifests remain marked `contract-only`; they describe intended operations without claiming worker, runtime, or remote implementations.
 
 ## Not started
 
@@ -65,4 +70,4 @@ No inherited test suite may run in the Foreman checkout, the source reference, o
 
 Complete F1-003: produce a trustworthy source-baseline report through the validated disposable-repository harness. Separate syntax and lint evidence, portable test results, environment-gated checks, harness defects, and product defects.
 
-Complete F1-010 before closing F1-006 so initialization validates adapter identities and availability through adapter-owned manifests rather than provider logic in the core.
+Complete F1-008 and F1-009: converge all plan-intake paths on canonical validated JSON, render standalone HTML review, and require explicit approval.
