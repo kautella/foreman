@@ -2,7 +2,7 @@
 
 ## Current objective
 
-Complete F1-002: reproduce and contain the inherited FirstMate test-cleanup risk in a validated expendable environment.
+Complete F1-003: produce trustworthy baseline evidence for the pinned source revision without treating inherited behavior as Foreman behavior.
 
 ## Established state
 
@@ -18,7 +18,9 @@ No active Foreman implementation exists yet.
 
 The initial repository baseline is committed as `1cde061`.
 
-F1-001 is complete: the pinned FirstMate revision has been verified as an external development reference, with its license, archive checksum, complete inventory, and the exclusion of upstream `AGENTS.md` recorded outside this repository. No FirstMate source has been executed or adopted as active Foreman code.
+F1-001 is complete: the pinned FirstMate revision has been verified as an external development reference, with its license, archive checksum, complete inventory, and the exclusion of upstream `AGENTS.md` recorded outside this repository.
+
+F1-002 is complete: the historical command-substitution fixture-cleanup defect was reproduced at revision `d0461e4b489c518eb744430742af62d73e2a16d0` and shown repaired at the pinned revision. Both checks ran through a Foreman-owned disposable-repository harness with exact ownership markers, control-directory survival checks, signal cleanup, and fail-closed target validation.
 
 No Foreman operational home, project configuration, task state, adapter implementation, worktree, worker, or remote-delivery path exists yet.
 
@@ -26,8 +28,8 @@ The historical planning material outside this repository is no longer a project 
 
 ## Current sequence
 
-1. Complete F1-002: contain inherited test execution in a validated expendable clone.
-2. Complete F1-003: produce source-baseline evidence only after containment is proven.
+1. Complete F1-003: produce source-baseline evidence through the validated disposable-repository harness.
+2. Establish the active Foreman skeleton and configuration contracts.
 3. Continue the remaining Phase 1 work in the approved dependency order.
 
 ## Immediate Phase 1 priorities
@@ -51,4 +53,4 @@ The historical planning material outside this repository is no longer a project 
 
 ## Next milestone
 
-The next milestone is validated containment of the inherited test harness. The Phase 1 readiness report, not functional parity or worker execution, remains the first implementation milestone.
+The next milestone is a trustworthy pinned-source baseline report that distinguishes harness defects, environment-gated checks, and product defects. The Phase 1 readiness report, not functional parity or worker execution, remains the first implementation milestone.
