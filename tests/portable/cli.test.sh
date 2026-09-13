@@ -12,7 +12,7 @@ test_help_is_neutral_and_actionable() {
   output=$("$foreman" --help) || test_fail 'help command failed'
   test_assert_contains "$output" 'Usage: foreman <command> [options]' \
     'help omitted command usage'
-  test_assert_contains "$output" 'worker execution is intentionally unavailable' \
+  test_assert_contains "$output" 'Worker execution is intentionally unavailable' \
     'help did not state the current capability boundary'
   test_pass 'help describes the current neutral command surface'
 }

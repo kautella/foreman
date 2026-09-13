@@ -2,7 +2,7 @@
 
 ## Current objective
 
-Complete F1-003 and F1-006: finish the contained source baseline and implement reviewed project initialization and diagnostics.
+Complete F1-003 and F1-010: finish the contained source baseline and connect reviewed initialization to the versioned adapter contracts.
 
 ## Established state
 
@@ -29,7 +29,7 @@ The historical planning material outside this repository is no longer a project 
 ## Current sequence
 
 1. Complete F1-003: produce source-baseline evidence through the validated disposable-repository harness.
-2. Implement reviewed initialization against the global and project configuration contracts.
+2. Define adapter contracts and use them to validate initialization choices.
 3. Continue the remaining Phase 1 work in the approved dependency order.
 
 ## Immediate Phase 1 priorities

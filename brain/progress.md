@@ -33,11 +33,16 @@ The active Foreman product skeleton exists with a neutral command surface, appro
 - Completed F1-005: added strict versioned JSON schemas and runtime validation for global configuration, project configuration, and worker profiles.
 - Configuration now requires canonical project and worktree paths, Git identity, explicit agent/model/reasoning selection, runtime, delivery policy, merge authority, and validation requirements.
 - Contract checks reject unknown fields, unsupported agent identities, duplicate validation commands, and remote delivery or merge authority for local-only projects.
+- Implemented the core of F1-006: `foreman init` gathers or prompts for every required project and worker choice, renders the proposed global and effective project configuration, requires explicit confirmation, and persists only accepted configuration.
+- Added read-only Git repository and remote detection, including explicit remote selection when multiple remotes are present and an explicit provider override for supported self-hosted GitLab repositories.
+- Added `foreman doctor` for core prerequisite, global configuration, project configuration, and live repository-identity diagnostics.
+- Completed the F1-007 path and state foundation: canonical absolute paths, non-overlapping home/project/worktree/Git roots, direct symbolic-link refusal, unique repository registration, atomic private configuration writes, and fail-closed malformed or unsupported configuration.
+- Verified that rejected or incomplete initialization creates no Foreman home and that remote detection does not mutate repository configuration.
 
 ## Not started
 
 - The pinned source baseline report.
-- `FOREMAN_HOME`, configuration, plan intake, adapter contracts, task lifecycle, and provider implementations.
+- Plan intake, adapter contracts, task lifecycle, and provider implementations.
 - The first upstream discovery record.
 
 ## Confirmed risk
@@ -59,3 +64,5 @@ No inherited test suite may run in the Foreman checkout, the source reference, o
 ## Next verified checkpoint
 
 Complete F1-003: produce a trustworthy source-baseline report through the validated disposable-repository harness. Separate syntax and lint evidence, portable test results, environment-gated checks, harness defects, and product defects.
+
+Complete F1-010 before closing F1-006 so initialization validates adapter identities and availability through adapter-owned manifests rather than provider logic in the core.
