@@ -20,7 +20,7 @@ The initial repository baseline is committed as `1cde061`.
 
 F1-001 is complete: the pinned FirstMate revision has been verified as an external development reference, with its license, archive checksum, complete inventory, and the exclusion of upstream `AGENTS.md` recorded outside this repository.
 
-F1-002 is complete: the historical command-substitution fixture-cleanup defect was reproduced at revision `d0461e4b489c518eb744430742af62d73e2a16d0` and shown repaired at the pinned revision. Both checks ran through a Foreman-owned disposable-repository harness with exact ownership markers, control-directory survival checks, signal cleanup, and fail-closed target validation.
+F1-002 is complete: the historical command-substitution fixture-cleanup defect was reproduced at revision `d0461e4b489c518eb744430742af62d73e2a16d0` and shown repaired at the pinned revision. Both checks ran through a local disposable-repository harness outside Foreman, with exact ownership markers, control-directory survival checks, signal cleanup, and fail-closed target validation.
 
 No Foreman operational home, project configuration, task state, adapter implementation, worktree, worker, or remote-delivery path exists yet.
 

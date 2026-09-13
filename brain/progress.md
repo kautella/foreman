@@ -6,7 +6,7 @@ Foreman is in Phase 1, producing a contained baseline of the pinned source refer
 
 The approved product contract, architecture, upstream map, Phase 1 backlog, and Project Brain routing are complete and live under `brain/`.
 
-The first Foreman-owned development tooling exists: a disposable-repository harness for safely examining inherited test behavior. No product runtime or supported orchestration capability exists yet.
+No active Foreman product implementation exists yet. Source-validation tooling remains outside the repository because it is local implementation support, not part of Foreman.
 
 ## Completed
 
@@ -23,7 +23,7 @@ The first Foreman-owned development tooling exists: a disposable-repository harn
 - Reviewed the initialized repository baseline: its documentation links and terminology boundaries are coherent, all untracked files are intentional, and the configured checks pass.
 - Created the initial repository commit `1cde061`.
 - Completed F1-001: verified the pinned FirstMate revision as an external development reference, recorded its MIT license, full source inventory, archive checksum, and excluded upstream `AGENTS.md` from Foreman instruction surfaces. No source snapshot is tracked in this repository.
-- Completed F1-002: added a neutral disposable-repository harness with validated temporary roots, exact root and control markers, isolated home and temporary paths, exact revision verification, interruption cleanup, and fail-closed deletion.
+- Completed F1-002 outside the repository: established a local disposable-repository harness with validated temporary roots, exact root and control markers, isolated home and temporary paths, exact revision verification, interruption cleanup, and fail-closed deletion.
 - Reproduced the historical fixture helper's command-substitution self-deletion at `d0461e4b489c518eb744430742af62d73e2a16d0` only inside the disposable harness.
 - Verified that the pinned source revision `3f035336f9df7331e195bc6279cc1577e1cf4b49` preserves the fixture root for the same behavioral check.
 - Verified containment behavior for normal execution, broad and ambiguous path refusal, ownership-marker tampering, checkout self-deletion, control-directory survival, and signal interruption.
@@ -38,7 +38,7 @@ The first Foreman-owned development tooling exists: a disposable-repository harn
 
 The historical fixture helper removed a newly created fixture root when called through command substitution because its exit trap ran in the subshell. The pinned revision contains an upstream repair.
 
-The disposable-repository harness contains accidental mutation by relocating the checkout and common home and temporary paths, but it is not an operating-system security sandbox. Inherited source is treated as trusted-but-risky test code, never as hostile code.
+The external disposable-repository harness contains accidental mutation by relocating the checkout and common home and temporary paths, but it is not an operating-system security sandbox. Inherited source is treated as trusted-but-risky test code, never as hostile code.
 
 No inherited test suite may run in the Foreman checkout, the source reference, or another non-disposable repository. Inherited results are source-baseline evidence only and never become Foreman behavior evidence by implication.
 
