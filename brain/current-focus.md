@@ -2,7 +2,7 @@
 
 ## Current objective
 
-Complete F1-003: produce trustworthy baseline evidence for the pinned source revision without treating inherited behavior as Foreman behavior.
+Complete F1-003 and F1-005: finish the contained source baseline and define Foreman's strict configuration contracts.
 
 ## Established state
 
@@ -14,7 +14,7 @@ The following documents are approved and define the current project contract:
 - `phase-1-backlog.md`
 - `brain/vision.md`
 
-No active Foreman implementation exists yet.
+The active Foreman skeleton now exists with a neutral command surface, approved source layout, and portable test entry point. It exposes only help and version information; no orchestration capability is represented as implemented.
 
 The initial repository baseline is committed as `1cde061`.
 
@@ -29,7 +29,7 @@ The historical planning material outside this repository is no longer a project 
 ## Current sequence
 
 1. Complete F1-003: produce source-baseline evidence through the validated disposable-repository harness.
-2. Establish the active Foreman skeleton and configuration contracts.
+2. Define the global and project configuration contracts.
 3. Continue the remaining Phase 1 work in the approved dependency order.
 
 ## Immediate Phase 1 priorities

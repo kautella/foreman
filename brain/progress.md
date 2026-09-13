@@ -6,7 +6,7 @@ Foreman is in Phase 1, producing a contained baseline of the pinned source refer
 
 The approved product contract, architecture, upstream map, Phase 1 backlog, and Project Brain routing are complete and live under `brain/`.
 
-No active Foreman product implementation exists yet. Source-validation tooling remains outside the repository because it is local implementation support, not part of Foreman.
+The active Foreman product skeleton exists with a neutral command surface, approved source layout, and portable test entry point. It intentionally exposes no worker, runtime, remote, or delivery operation. Source-validation tooling remains outside the repository because it is local implementation support, not part of Foreman.
 
 ## Completed
 
@@ -27,6 +27,9 @@ No active Foreman product implementation exists yet. Source-validation tooling r
 - Reproduced the historical fixture helper's command-substitution self-deletion at `d0461e4b489c518eb744430742af62d73e2a16d0` only inside the disposable harness.
 - Verified that the pinned source revision `3f035336f9df7331e195bc6279cc1577e1cf4b49` preserves the fixture root for the same behavioral check.
 - Verified containment behavior for normal execution, broad and ambiguous path refusal, ownership-marker tampering, checkout self-deletion, control-directory survival, and signal interruption.
+- Completed F1-004: established the active `bin/`, `lib/`, `contracts/`, `adapters/`, `rendering/`, `tests/`, and `docs/` layout.
+- Added the neutral `foreman` command with stable help, version output, clear refusal of unknown commands, and no inherited executable or compatibility path.
+- Added a portable Foreman-owned test runner and initial command-surface tests.
 
 ## Not started
 
