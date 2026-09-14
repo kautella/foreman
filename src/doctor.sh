@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# shellcheck source=lib/foreman/path.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/path.sh"
-# shellcheck source=lib/foreman/configuration/validate.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/configuration/validate.sh"
-# shellcheck source=lib/foreman/adapters/registry.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/adapters/registry.sh"
+# shellcheck source=src/path.sh
+. "$FOREMAN_SOURCE_ROOT/src/path.sh"
+# shellcheck source=src/configuration/validate.sh
+. "$FOREMAN_SOURCE_ROOT/src/configuration/validate.sh"
+# shellcheck source=src/adapters/registry.sh
+. "$FOREMAN_SOURCE_ROOT/src/adapters/registry.sh"
 
 foreman_doctor_check_command() {
   local command=$1

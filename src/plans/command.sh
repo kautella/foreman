@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
-# shellcheck source=lib/foreman/path.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/path.sh"
-# shellcheck source=lib/foreman/state/atomic.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/state/atomic.sh"
-# shellcheck source=lib/foreman/configuration/validate.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/configuration/validate.sh"
-# shellcheck source=lib/foreman/plans/validate.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/plans/validate.sh"
-# shellcheck source=lib/foreman/rendering/plan.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/rendering/plan.sh"
-# shellcheck source=lib/foreman/text.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/text.sh"
+# shellcheck source=src/path.sh
+. "$FOREMAN_SOURCE_ROOT/src/path.sh"
+# shellcheck source=src/state/atomic.sh
+. "$FOREMAN_SOURCE_ROOT/src/state/atomic.sh"
+# shellcheck source=src/configuration/validate.sh
+. "$FOREMAN_SOURCE_ROOT/src/configuration/validate.sh"
+# shellcheck source=src/plans/validate.sh
+. "$FOREMAN_SOURCE_ROOT/src/plans/validate.sh"
+# shellcheck source=src/artifacts/plan.sh
+. "$FOREMAN_SOURCE_ROOT/src/artifacts/plan.sh"
+# shellcheck source=src/text.sh
+. "$FOREMAN_SOURCE_ROOT/src/text.sh"
 
 foreman_plan_usage() {
   cat <<'EOF'

@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
-# shellcheck source=lib/foreman/path.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/path.sh"
-# shellcheck source=lib/foreman/state/atomic.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/state/atomic.sh"
-# shellcheck source=lib/foreman/projects/remote.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/projects/remote.sh"
-# shellcheck source=lib/foreman/configuration/validate.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/configuration/validate.sh"
-# shellcheck source=lib/foreman/adapters/registry.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/adapters/registry.sh"
-# shellcheck source=lib/foreman/text.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/text.sh"
+# shellcheck source=src/path.sh
+. "$FOREMAN_SOURCE_ROOT/src/path.sh"
+# shellcheck source=src/state/atomic.sh
+. "$FOREMAN_SOURCE_ROOT/src/state/atomic.sh"
+# shellcheck source=src/projects/remote.sh
+. "$FOREMAN_SOURCE_ROOT/src/projects/remote.sh"
+# shellcheck source=src/configuration/validate.sh
+. "$FOREMAN_SOURCE_ROOT/src/configuration/validate.sh"
+# shellcheck source=src/adapters/registry.sh
+. "$FOREMAN_SOURCE_ROOT/src/adapters/registry.sh"
+# shellcheck source=src/text.sh
+. "$FOREMAN_SOURCE_ROOT/src/text.sh"
 
 foreman_init_usage() {
   cat <<'EOF'

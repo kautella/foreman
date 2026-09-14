@@ -16,6 +16,7 @@ The following approved documents remain the project contract:
 
 Phase 1 is complete on the feature branch. Foreman now provides:
 
+- a single tracked product tree under `src/`, a generated ignored root launcher, and a safe installer with an optional explicit executable-directory link;
 - a neutral command surface with `init`, `doctor`, and reviewed `plan` workflows;
 - strict versioned configuration, plan, handover, and adapter contracts;
 - reviewed, atomic project initialization with Git identity and path-safety checks;
@@ -37,6 +38,7 @@ The review should confirm:
 2. The three plan-intake routes and explicit approval boundary are the correct gateway to future execution.
 3. The source-baseline failure classifications and upstream adoption candidates are reasonable.
 4. The Phase 1 implementation is ready to become the base for Phase 2 planning.
+5. The clone-and-operate and direct-executable access modes are clear, safe, and backed by the same implementation.
 
 ## Constraints
 

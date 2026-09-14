@@ -5,10 +5,10 @@ set -u
 repo_root="$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd)"
 FOREMAN_SOURCE_ROOT=$repo_root
 export FOREMAN_SOURCE_ROOT
-# shellcheck source=lib/foreman/path.sh
-. "$repo_root/lib/foreman/path.sh"
-# shellcheck source=lib/foreman/state/atomic.sh
-. "$repo_root/lib/foreman/state/atomic.sh"
+# shellcheck source=src/path.sh
+. "$repo_root/src/path.sh"
+# shellcheck source=src/state/atomic.sh
+. "$repo_root/src/state/atomic.sh"
 # shellcheck source=tests/test-helper.sh
 . "$repo_root/tests/test-helper.sh"
 
@@ -51,7 +51,7 @@ test_malformed_and_unsupported_configuration_fails_closed() {
   config="$home/config.json"
   printf '{not-json}\n' >"$config"
   set +e
-  output=$(FOREMAN_HOME="$home" "$repo_root/bin/foreman" doctor 2>&1)
+  output=$(FOREMAN_HOME="$home" "$repo_root/foreman" doctor 2>&1)
   status=$?
   set -e
   [ "$status" -ne 0 ] || test_fail 'doctor accepted malformed global configuration'
@@ -70,7 +70,7 @@ test_malformed_and_unsupported_configuration_fails_closed() {
     }
   }' >"$config"
   set +e
-  output=$(FOREMAN_HOME="$home" "$repo_root/bin/foreman" doctor 2>&1)
+  output=$(FOREMAN_HOME="$home" "$repo_root/foreman" doctor 2>&1)
   status=$?
   set -e
   [ "$status" -ne 0 ] || test_fail 'doctor accepted an unsupported schema version'

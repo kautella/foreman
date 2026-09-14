@@ -16,6 +16,8 @@ It is not a coding agent, terminal emulator, Git host, or general plugin platfor
 
 Foreman may help users formulate an execution plan, but it does not decide product strategy or execute an unapproved proposal.
 
+Foreman supports two access modes over the same implementation. A user may clone the repository and let Codex operate Foreman from that checkout, or a user or external coordinator may invoke Foreman's executable directly. Neither access mode changes Foreman's authority, policy, state model, or safety boundaries.
+
 ## The intended outcome
 
 A Foreman-managed project should be able to:
@@ -25,6 +27,7 @@ A Foreman-managed project should be able to:
 - survive lost terminals, restarts, and interrupted supervision without relying on conversation memory;
 - make task status, validation evidence, risks, decisions, and delivery state durable and reviewable;
 - use supported coding-agent, runtime, and remote providers without allowing their differences to leak into the core;
+- expose one consistent command surface to an agent operating inside the checkout and to callers invoking Foreman externally;
 - deliver through a policy chosen explicitly for each project;
 - preserve human control over consequential actions while allowing narrowly authorized automation.
 
@@ -67,6 +70,7 @@ Foreman does not:
 - The coordinator core is implemented in Bash during the initial product evolution.
 - Global and project configuration use strict, versioned JSON and require `jq`.
 - Foreman's operational home is separate from both its own source checkout and every managed repository.
+- Foreman's repository-local executable is generated from tracked installation tooling, delegates to the tracked `src/` implementation, and is never authoritative source or durable state.
 - Agent adapters initially support Claude Code, Codex CLI, Gemini CLI, OpenCode, and Pi.
 - Runtime adapters initially support tmux and Herdr.
 - GitHub and GitLab, including supported self-hosted GitLab instances, are optional remote adapters.

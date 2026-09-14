@@ -6,6 +6,11 @@ repo_root="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 status=0
 count=0
 
+if ! "$repo_root/scripts/install.sh" >/dev/null; then
+  printf 'test: could not generate the repository launcher\n' >&2
+  exit 1
+fi
+
 for test_file in "$repo_root"/tests/portable/*.test.sh; do
   [ -f "$test_file" ] || continue
   count=$((count + 1))

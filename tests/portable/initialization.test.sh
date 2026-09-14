@@ -3,7 +3,7 @@
 set -u
 
 repo_root="$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd)"
-foreman="$repo_root/bin/foreman"
+foreman="$repo_root/foreman"
 # shellcheck source=tests/test-helper.sh
 . "$repo_root/tests/test-helper.sh"
 

@@ -31,7 +31,7 @@ scan_file() {
   fi
 }
 
-for directory in adapters bin contracts docs lib rendering scripts tests .githooks; do
+for directory in src docs scripts tests .githooks; do
   [ -d "$repo_root/$directory" ] || continue
   while IFS= read -r file; do
     case "$file" in
@@ -43,12 +43,12 @@ done
 while IFS= read -r file; do
   relative=${file#"$repo_root"/}
   case "$relative" in
-    adapters/*|tests/*|scripts/check-boundaries.sh) continue ;;
+    src/adapters/*|tests/*|scripts/check-boundaries.sh) continue ;;
   esac
   if LC_ALL=C grep -Ein "$provider_pattern" "$file" >/dev/null 2>&1; then
     fail "provider executable invocation outside an adapter in $relative"
   fi
-done < <(find "$repo_root/bin" "$repo_root/lib" "$repo_root/scripts" "$repo_root/.githooks" -type f -name '*.sh' -print)
+done < <(find "$repo_root/src" "$repo_root/scripts" "$repo_root/.githooks" -type f -name '*.sh' -print)
 
 while IFS= read -r file; do
   relative=${file#"$repo_root"/}

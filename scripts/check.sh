@@ -53,6 +53,10 @@ check_bash_files() {
   if [ -f '.githooks/pre-commit' ] && ! bash -n '.githooks/pre-commit'; then
     fail 'invalid Bash syntax: .githooks/pre-commit'
   fi
+
+  if [ -f 'foreman' ] && ! bash -n 'foreman'; then
+    fail 'invalid Bash syntax: foreman'
+  fi
 }
 
 check_tracked_ide_metadata() {
@@ -79,6 +83,23 @@ require_file 'brain/upstream-map.md'
 require_file 'brain/phase-1-backlog.md'
 require_file 'brain/current-focus.md'
 require_file 'brain/progress.md'
+require_file 'scripts/install.sh'
+require_file 'src/main.sh'
+require_file 'src/cli.sh'
+require_file 'src/contracts/README.md'
+require_file 'src/adapters/README.md'
+
+if ! "$repo_root/scripts/install.sh" >/dev/null; then
+  fail 'could not generate the repository launcher'
+fi
+
+if ! git check-ignore -q -- foreman; then
+  fail 'the generated repository launcher is not ignored'
+fi
+
+if git ls-files --error-unmatch foreman >/dev/null 2>&1; then
+  fail 'the generated repository launcher must not be tracked'
+fi
 
 if ! git diff --check; then
   fail 'unstaged changes contain whitespace errors'

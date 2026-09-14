@@ -12,10 +12,10 @@ trap 'rm -rf "$test_root"' EXIT HUP INT TERM
 
 make_fixture() {
   local root=$1
-  mkdir -p "$root/lib" "$root/adapters" "$root/tests" "$root/docs" "$root/bin" \
-    "$root/contracts" "$root/rendering" "$root/scripts" "$root/.githooks"
+  mkdir -p "$root/src/adapters" "$root/tests" "$root/docs" "$root/scripts" \
+    "$root/.githooks"
   printf '# Project instructions\n' >"$root/AGENTS.md"
-  printf '#!/usr/bin/env bash\nprintf "safe\\n"\n' >"$root/lib/core.sh"
+  printf '#!/usr/bin/env bash\nprintf "safe\\n"\n' >"$root/src/core.sh"
 }
 
 assert_rejected() {
@@ -46,7 +46,7 @@ test_prohibited_terms_and_compatibility_are_rejected() {
 test_direct_provider_invocation_is_rejected() {
   local root="$test_root/provider"
   make_fixture "$root"
-  printf '#!/usr/bin/env bash\ncodex exec task\n' >"$root/lib/core.sh"
+  printf '#!/usr/bin/env bash\ncodex exec task\n' >"$root/src/core.sh"
   assert_rejected "$root" 'provider executable invocation outside an adapter'
   test_pass 'direct provider invocation is rejected outside adapters'
 }
@@ -55,8 +55,8 @@ test_local_reference_paths_and_nested_instructions_are_rejected() {
   local root="$test_root/reference"
   make_fixture "$root"
   printf '/Users/example/%s/tool-reference\n' 'Build' >"$root/docs/location.md"
-  mkdir -p "$root/lib/nested"
-  printf '# Unexpected\n' >"$root/lib/nested/AGENTS.md"
+  mkdir -p "$root/src/nested"
+  printf '# Unexpected\n' >"$root/src/nested/AGENTS.md"
   assert_rejected "$root" 'local external-source location'
   assert_rejected "$root" 'unexpected nested instruction file'
   test_pass 'local reference paths and nested instructions are rejected'

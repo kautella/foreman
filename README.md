@@ -6,6 +6,26 @@ It turns approved execution plans into bounded tasks, isolates concurrent work, 
 
 > **Status: early development.** Foreman is not yet usable for production orchestration.
 
+## Two ways to use the repository
+
+Foreman supports the same product surface from two entry paths:
+
+- Clone the repository, open it with Codex, and work from the checkout. Repository instructions tell Codex to generate the local `./foreman` launcher when it is needed.
+- Generate the launcher yourself and call it from this checkout or through an optional link in your preferred executable directory.
+
+```sh
+./scripts/install.sh
+./foreman --help
+```
+
+To make the command available elsewhere, choose an absolute executable directory:
+
+```sh
+./scripts/install.sh --link /absolute/path/to/bin
+```
+
+The root `foreman` file is generated and ignored by Git. It always delegates to the tracked implementation under `src/`, so both entry paths run the same code.
+
 ## Why Foreman
 
 Coordinating coding agents across several tasks requires reliable worktree isolation, worker supervision, recovery, validation, delivery controls, and durable state.

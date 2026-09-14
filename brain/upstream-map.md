@@ -57,11 +57,11 @@ Foreman may adapt selected source behavior from the pinned reference without imp
 | Markdown backlog | Optional human-readable task projection | Redesign/defer | Canonical plan and task state remain validated JSON; a Markdown view cannot become the authoritative machine record. |
 | Plan and task reports | `plan-{slug}.html`, `report-{slug}.html` | Add/redesign | Standalone semantic HTML with embedded CSS, stored in Foreman-owned project state. |
 | Spawn, watch, state classification, locks, wake queues, teardown | Foreman core lifecycle and contracts | Retain/redesign | Exact task identity, durable events, recovery, fail-closed ambiguity, and safe cleanup. |
-| tmux backend | `adapters/runtimes/tmux/` | Retain/redesign | Full lifecycle control and exact endpoint safety. |
-| Herdr backend and helpers | `adapters/runtimes/herdr/` | Retain/redesign | Version-gated lifecycle, recovery, and stability evidence. |
+| tmux backend | `src/adapters/runtimes/tmux/` | Retain/redesign | Full lifecycle control and exact endpoint safety. |
+| Herdr backend and helpers | `src/adapters/runtimes/herdr/` | Retain/redesign | Version-gated lifecycle, recovery, and stability evidence. |
 | Zellij, cmux, Orca, Codex App paths | None | Remove | No code, schema, tests, fixtures, docs, or fallback branches remain. |
 | Claude Code, Codex CLI, OpenCode, Pi harnesses | Built-in agent adapters | Retain/redesign | Adapter-owned discovery, launch, supervision, recovery, and profile validation. |
-| Gemini CLI | `adapters/agents/gemini/` | Add | Equivalent lifecycle support and live verification before release support. |
+| Gemini CLI | `src/adapters/agents/gemini/` | Add | Equivalent lifecycle support and live verification before release support. |
 | `pi-signed`, Grok, Kimi, Cursor, Muse | None | Remove | No adapter, compatibility shim, fixture, documentation, or runtime branch remains. |
 | GitHub PR scripts | GitHub remote adapter | Redesign | Policy-gated draft handoff, automated change-request delivery, status, and optional merge execution. |
 | Partial GitLab support | GitLab remote adapter | Redesign/add | GitLab.com and supported self-hosted GitLab lifecycle parity, including creation, pipeline status, and permitted merge execution. |

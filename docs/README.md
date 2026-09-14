@@ -7,7 +7,7 @@ This directory is reserved for user and contributor documentation that describes
 Current command help is available through:
 
 ```sh
-./bin/foreman --help
+./foreman --help
 ```
 
 The current initialization and plan-review workflow is documented in [Getting started](getting-started.md). The recommended plan shape is available in the [plan template](plan-template.md).

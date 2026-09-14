@@ -60,7 +60,7 @@ foreman_plan_validate_input() {
     ([.unresolved_decisions[].id] | length == (unique | length)) and
     (.references | type == "array" and all(.[]; reference))
   ' "$file" >/dev/null 2>&1 || {
-    foreman_plan_error "input does not match contracts/plan/input.schema.json: $file"
+    foreman_plan_error "input does not match src/contracts/plan/input.schema.json: $file"
     return 1
   }
 
@@ -100,7 +100,7 @@ foreman_plan_validate_handover() {
     (.source | exact(["reference", "system"]) and (.system | nonempty) and (.reference | nonempty)) and
     (.plan | type == "object")
   ' "$file" >/dev/null 2>&1 || {
-    foreman_plan_error "handover does not match contracts/plan/handover.schema.json: $file"
+    foreman_plan_error "handover does not match src/contracts/plan/handover.schema.json: $file"
     return 1
   }
   jq -S '.plan' "$file" >"$input_file" || return 1
@@ -131,7 +131,7 @@ foreman_plan_validate_canonical() {
        (.approved_at | nonempty) and (.approved_by | nonempty))
      end)
   ' "$file" >/dev/null 2>&1 || {
-    foreman_plan_error "canonical plan does not match contracts/plan/plan.schema.json: $file"
+    foreman_plan_error "canonical plan does not match src/contracts/plan/plan.schema.json: $file"
     return 1
   }
 

@@ -5,16 +5,16 @@ set -u
 repo_root="$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd)"
 FOREMAN_SOURCE_ROOT=$repo_root
 export FOREMAN_SOURCE_ROOT
-# shellcheck source=lib/foreman/configuration/validate.sh
-. "$repo_root/lib/foreman/configuration/validate.sh"
+# shellcheck source=src/configuration/validate.sh
+. "$repo_root/src/configuration/validate.sh"
 # shellcheck source=tests/test-helper.sh
 . "$repo_root/tests/test-helper.sh"
 
 test_root=$(mktemp -d '/tmp/foreman-configuration-contracts.XXXXXX') || exit 1
 trap 'rm -rf "$test_root"' EXIT HUP INT TERM
 
-global_example="$repo_root/contracts/configuration/examples/global.json"
-project_example="$repo_root/contracts/configuration/examples/project-local.json"
+global_example="$repo_root/src/contracts/configuration/examples/global.json"
+project_example="$repo_root/src/contracts/configuration/examples/project-local.json"
 
 test_examples_are_valid() {
   foreman_validate_global_configuration "$global_example" \
@@ -62,7 +62,7 @@ test_worker_profile_is_required_and_closed() {
 
 test_schema_documents_are_valid_json() {
   local schema
-  for schema in "$repo_root"/contracts/configuration/*.schema.json; do
+  for schema in "$repo_root"/src/contracts/configuration/*.schema.json; do
     jq empty "$schema" || test_fail "invalid schema JSON: $schema"
   done
   test_pass 'configuration schema documents are valid JSON'

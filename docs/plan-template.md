@@ -29,6 +29,6 @@ For every task provide:
 - `project-default`, `draft-handoff`, or `automated-change-request` as the delivery expectation;
 - an optional worker-profile hint containing agent, model, and reasoning or effort.
 
-The machine-readable example at [`contracts/plan/examples/direct-plan.json`](../contracts/plan/examples/direct-plan.json) is the authoritative input shape. An external coordinator wraps that shape using [`contracts/plan/examples/external-handover.json`](../contracts/plan/examples/external-handover.json).
+The machine-readable example at [`src/contracts/plan/examples/direct-plan.json`](../src/contracts/plan/examples/direct-plan.json) is the authoritative input shape. An external coordinator wraps that shape using [`src/contracts/plan/examples/external-handover.json`](../src/contracts/plan/examples/external-handover.json).
 
 Plan provenance never grants delivery, merge, discard, or execution authority. Foreman applies the registered project policy and requires explicit approval after rendering the review artifact.

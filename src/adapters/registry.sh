@@ -21,7 +21,7 @@ foreman_adapter_manifest_file() {
       return 1
       ;;
   esac
-  printf '%s/adapters/%s/%s/manifest.json\n' "$FOREMAN_SOURCE_ROOT" "$collection" "$id"
+  printf '%s/src/adapters/%s/%s/manifest.json\n' "$FOREMAN_SOURCE_ROOT" "$collection" "$id"
 }
 
 foreman_adapter_validate_manifest() {

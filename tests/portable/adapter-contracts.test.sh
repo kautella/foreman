@@ -5,8 +5,8 @@ set -u
 repo_root="$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd)"
 FOREMAN_SOURCE_ROOT=$repo_root
 export FOREMAN_SOURCE_ROOT
-# shellcheck source=lib/foreman/adapters/registry.sh
-. "$repo_root/lib/foreman/adapters/registry.sh"
+# shellcheck source=src/adapters/registry.sh
+. "$repo_root/src/adapters/registry.sh"
 # shellcheck source=tests/test-helper.sh
 . "$repo_root/tests/test-helper.sh"
 
@@ -25,7 +25,7 @@ remote gitlab
 runtime herdr
 runtime tmux'
   actual=$(
-    find "$repo_root/adapters" -mindepth 3 -maxdepth 3 -name manifest.json -type f |
+    find "$repo_root/src/adapters" -mindepth 3 -maxdepth 3 -name manifest.json -type f |
       while IFS= read -r file; do
         jq -r '[.kind, .id] | @tsv' "$file" | tr '\t' ' '
       done | LC_ALL=C sort
@@ -55,8 +55,8 @@ test_unknown_identity_and_operation_fail_closed() {
 
 test_normalized_request_and_result_validate() {
   local request result
-  request="$repo_root/contracts/adapter/examples/request.json"
-  result="$repo_root/contracts/adapter/examples/result.json"
+  request="$repo_root/src/contracts/adapter/examples/request.json"
+  result="$repo_root/src/contracts/adapter/examples/result.json"
   foreman_adapter_validate_request "$request" \
     || test_fail 'normalized request example did not validate'
   foreman_adapter_validate_result "$result" \
@@ -68,7 +68,7 @@ test_malformed_result_is_rejected() {
   local invalid
   invalid="$test_root/invalid-result.json"
   jq '.ok = false | .status = "ok" | .diagnostics = []' \
-    "$repo_root/contracts/adapter/examples/result.json" >"$invalid"
+    "$repo_root/src/contracts/adapter/examples/result.json" >"$invalid"
   if foreman_adapter_validate_result "$invalid" >/dev/null 2>&1; then
     test_fail 'contradictory adapter result was accepted'
   fi
@@ -88,12 +88,12 @@ test_profile_contract_requires_explicit_values() {
 }
 
 test_remote_host_matching_stays_in_remote_adapters() {
-  "$repo_root/adapters/remotes/github/match-host.sh" github.com \
+  "$repo_root/src/adapters/remotes/github/match-host.sh" github.com \
     || test_fail 'GitHub adapter did not recognize its public host'
-  if "$repo_root/adapters/remotes/github/match-host.sh" gitlab.com; then
+  if "$repo_root/src/adapters/remotes/github/match-host.sh" gitlab.com; then
     test_fail 'GitHub adapter recognized a GitLab host'
   fi
-  "$repo_root/adapters/remotes/gitlab/match-host.sh" gitlab.com \
+  "$repo_root/src/adapters/remotes/gitlab/match-host.sh" gitlab.com \
     || test_fail 'GitLab adapter did not recognize its public host'
   test_pass 'remote host matching remains adapter-owned'
 }

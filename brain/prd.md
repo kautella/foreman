@@ -37,6 +37,7 @@ Foreman must:
 10. Retain Bash during the initial parity and extraction work.
 11. Maintain a configurable Foreman home with global configuration and isolated, durable state for each managed project.
 12. Accept, exchange, and guide the drafting of reviewable execution plans without taking ownership of product strategy or executing unapproved work.
+13. Provide the same command surface to Codex operating from a cloned checkout and to external callers invoking a Foreman executable.
 
 ## Delivery policy and merge authority
 
@@ -109,6 +110,10 @@ Task metadata records the report's canonical path.
 ### Bootstrap and projects
 
 - Bootstrap works with Git plus one supported agent and runtime.
+- A cloned Foreman checkout is directly operable by Codex through repository instructions. If the repository-local `foreman` executable is absent, the tracked installer generates it before product operations begin.
+- `scripts/install.sh` generates an ignored `foreman` executable at the repository root. It may also create an explicitly requested link in an absolute user-selected executable directory. It never silently chooses or modifies an external executable directory.
+- The generated executable contains no product logic. It delegates to the tracked implementation under `src/`, and both repository-local and externally linked invocation use that same implementation.
+- Installation refuses to overwrite a root executable or external link it cannot prove it owns.
 - Foreman has a configurable home root, distinct from its source checkout and from managed repositories. A global configuration file in that root governs home-wide defaults and settings.
 - The Foreman home contains a `projects/` directory. Each managed project has an isolated `projects/<project-name>/` directory that contains its project configuration and all project-owned Foreman state.
 - Project initialization explicitly obtains a project name and target project folder. Foreman canonicalizes the target as an absolute path, verifies its Git identity, and binds that identity to the selected project name. It must not silently adopt the current working directory.
@@ -196,3 +201,4 @@ The initial stable release requires:
 7. No active FirstMate nautical theme, persona, terminology, or compatibility promise outside required attribution.
 8. Complete MIT attribution and auditable baseline provenance.
 9. Direct-plan, external-handover, and guided-drafting evidence, including approval refusal and standalone HTML plan review artifacts.
+10. Repository-local installation, safe refresh, unowned-file refusal, and explicitly selected external-link evidence.

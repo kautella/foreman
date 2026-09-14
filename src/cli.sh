@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-# shellcheck source=lib/foreman/version.sh
-. "$FOREMAN_SOURCE_ROOT/lib/foreman/version.sh"
+# shellcheck source=src/version.sh
+. "$FOREMAN_SOURCE_ROOT/src/version.sh"
 
 foreman_cli_usage() {
   cat <<'EOF'
@@ -34,20 +34,20 @@ foreman_cli_main() {
       ;;
     doctor)
       shift
-      # shellcheck source=lib/foreman/doctor.sh
-      . "$FOREMAN_SOURCE_ROOT/lib/foreman/doctor.sh"
+      # shellcheck source=src/doctor.sh
+      . "$FOREMAN_SOURCE_ROOT/src/doctor.sh"
       foreman_doctor_command "$@"
       ;;
     init)
       shift
-      # shellcheck source=lib/foreman/projects/init.sh
-      . "$FOREMAN_SOURCE_ROOT/lib/foreman/projects/init.sh"
+      # shellcheck source=src/projects/init.sh
+      . "$FOREMAN_SOURCE_ROOT/src/projects/init.sh"
       foreman_init_command "$@"
       ;;
     plan)
       shift
-      # shellcheck source=lib/foreman/plans/command.sh
-      . "$FOREMAN_SOURCE_ROOT/lib/foreman/plans/command.sh"
+      # shellcheck source=src/plans/command.sh
+      . "$FOREMAN_SOURCE_ROOT/src/plans/command.sh"
       foreman_plan_command "$@"
       ;;
     *)

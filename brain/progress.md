@@ -10,7 +10,9 @@ Foreman has a tested foundation for project registration and reviewed plan intak
 
 - Established Foreman as an independent, provider-neutral execution-supervision project.
 - Added the neutral `foreman` command with help, version, `init`, `doctor`, and `plan` command families.
-- Created the approved `bin/`, `lib/`, `contracts/`, `adapters/`, `rendering/`, `tests/`, and `docs/` structure.
+- Consolidated all tracked product implementation, adapters, contracts, and artifact assets under `src/`; kept development and installation utilities under `scripts/`, and retained `tests/`, `docs/`, and `brain/` as focused top-level surfaces.
+- Added a tracked installer that safely generates the ignored root `foreman` launcher and can create an explicitly requested link in an absolute executable directory.
+- Made Codex-operated checkout use and direct executable use converge on the same `src/main.sh` entry point, with no product logic in the generated launcher.
 - Added strict versioned JSON schemas for global configuration, project configuration, worker profiles, direct plan input, external handover, canonical plans, adapter manifests, adapter requests, and adapter results.
 - Kept the supported agent set closed to Claude Code, Codex CLI, Gemini CLI, OpenCode, and Pi.
 - Added contract-only manifests for those five agents, tmux, Herdr, GitHub, and GitLab without representing any provider as implemented.
@@ -40,8 +42,9 @@ Foreman has a tested foundation for project registration and reviewed plan intak
 
 - Added active-code scans that reject prohibited source terminology, compatibility paths, local source-reference paths, unexpected nested instructions, and direct provider invocation outside adapters.
 - Added portable checks for the command surface, configuration contracts, initialization, path and state safety, plan review, adapter contracts, and source boundaries.
+- Added portable installation checks for launcher generation, safe refresh, linked invocation, and refusal to overwrite an unowned launcher.
 - Added JSON validation, Bash syntax validation, whitespace checks, IDE metadata checks, contributor guidance, and a pre-commit hook that cleanly calls the shared check runner.
-- Verified all seven portable test files, the boundary scan, all tracked JSON, Bash syntax, and diff checks.
+- Verified all eight portable test files, the boundary scan, all tracked JSON, Bash syntax, generated-launcher ignore status, and diff checks.
 - Verified the active shell sources with pinned ShellCheck 0.11.0 before the final documentation-only readiness update.
 
 ## Completed source and upstream evidence
@@ -68,6 +71,7 @@ All F1-001 through F1-014 acceptance areas have evidence:
 - disposable test containment;
 - source syntax, lint, tool, coverage, gated-test, and failure classification;
 - active Foreman structure and command namespace;
+- repository-local and externally linked access through one safely generated executable;
 - strict configuration and reviewed initialization;
 - path, identity, and atomic-state safety;
 - plan exchange, HTML review, and explicit approval;

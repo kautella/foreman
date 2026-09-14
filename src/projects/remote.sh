@@ -9,7 +9,7 @@ FOREMAN_REMOTE_REPOSITORY=
 foreman_remote_provider_for_host() {
   local host=$1 manifest provider matcher matched=
 
-  for manifest in "$FOREMAN_SOURCE_ROOT"/adapters/remotes/*/manifest.json; do
+  for manifest in "$FOREMAN_SOURCE_ROOT"/src/adapters/remotes/*/manifest.json; do
     [ -f "$manifest" ] || continue
     provider=$(jq -r '.id' "$manifest")
     matcher=${manifest%/manifest.json}/match-host.sh

@@ -3,7 +3,7 @@
 set -u
 
 repo_root="$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd)"
-foreman="$repo_root/bin/foreman"
+foreman="$repo_root/foreman"
 # shellcheck source=tests/test-helper.sh
 . "$repo_root/tests/test-helper.sh"
 
@@ -38,7 +38,7 @@ test_direct_plan_creates_canonical_json_and_standalone_review() {
   local input output plan_id plan_dir review status
   input="$test_root/direct.json"
   jq '.title = "<script>alert(1)</script>" | .objective = "Review <safe> content"' \
-    "$repo_root/contracts/plan/examples/direct-plan.json" >"$input"
+    "$repo_root/src/contracts/plan/examples/direct-plan.json" >"$input"
   output=$(FOREMAN_HOME="$home" "$foreman" plan create --project plan-project --file "$input") \
     || test_fail 'direct plan creation failed'
   plan_id=$(plan_id_from_output "$output")
@@ -79,7 +79,7 @@ test_invalid_structure_dependencies_and_policy_are_rejected() {
   input="$test_root/invalid.json"
   before=$(find "$project_root/plans" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')
 
-  jq '.unexpected = true' "$repo_root/contracts/plan/examples/direct-plan.json" >"$input"
+  jq '.unexpected = true' "$repo_root/src/contracts/plan/examples/direct-plan.json" >"$input"
   set +e
   output=$(FOREMAN_HOME="$home" "$foreman" plan create --project plan-project --file "$input" 2>&1)
   status=$?
@@ -88,7 +88,7 @@ test_invalid_structure_dependencies_and_policy_are_rejected() {
   test_assert_contains "$output" 'does not match' 'invalid structure was not diagnosed'
 
   jq '.tasks[0].depends_on = ["missing-task"]' \
-    "$repo_root/contracts/plan/examples/direct-plan.json" >"$input"
+    "$repo_root/src/contracts/plan/examples/direct-plan.json" >"$input"
   set +e
   output=$(FOREMAN_HOME="$home" "$foreman" plan create --project plan-project --file "$input" 2>&1)
   status=$?
@@ -97,7 +97,7 @@ test_invalid_structure_dependencies_and_policy_are_rejected() {
   test_assert_contains "$output" 'unknown task' 'unknown dependency was not diagnosed'
 
   jq '.tasks[0].depends_on = ["health-summary"]' \
-    "$repo_root/contracts/plan/examples/direct-plan.json" >"$input"
+    "$repo_root/src/contracts/plan/examples/direct-plan.json" >"$input"
   set +e
   output=$(FOREMAN_HOME="$home" "$foreman" plan create --project plan-project --file "$input" 2>&1)
   status=$?
@@ -106,7 +106,7 @@ test_invalid_structure_dependencies_and_policy_are_rejected() {
   test_assert_contains "$output" 'contain a cycle' 'dependency cycle was not diagnosed'
 
   jq '.tasks[0].delivery_expectation = "automated-change-request"' \
-    "$repo_root/contracts/plan/examples/direct-plan.json" >"$input"
+    "$repo_root/src/contracts/plan/examples/direct-plan.json" >"$input"
   set +e
   output=$(FOREMAN_HOME="$home" "$foreman" plan create --project plan-project --file "$input" 2>&1)
   status=$?
@@ -123,7 +123,7 @@ test_invalid_structure_dependencies_and_policy_are_rejected() {
 test_external_handover_records_provenance_without_authority() {
   local handover output plan_id plan
   handover="$test_root/handover.json"
-  cp "$repo_root/contracts/plan/examples/external-handover.json" "$handover"
+  cp "$repo_root/src/contracts/plan/examples/external-handover.json" "$handover"
   output=$(FOREMAN_HOME="$home" "$foreman" plan handover --project plan-project --file "$handover") \
     || test_fail 'valid external handover failed'
   plan_id=$(plan_id_from_output "$output")
@@ -166,7 +166,7 @@ test_approval_blocks_incomplete_plans_and_updates_complete_plans() {
   decision="$test_root/decision.json"
   clean="$test_root/clean.json"
   jq '.title = "Blocked plan" | .missing_information = ["Required API behavior"]' \
-    "$repo_root/contracts/plan/examples/direct-plan.json" >"$blocked"
+    "$repo_root/src/contracts/plan/examples/direct-plan.json" >"$blocked"
   output=$(FOREMAN_HOME="$home" "$foreman" plan create --project plan-project --file "$blocked") \
     || test_fail 'blocked proposal creation failed'
   blocked_id=$(plan_id_from_output "$output")
@@ -178,7 +178,7 @@ test_approval_blocks_incomplete_plans_and_updates_complete_plans() {
   test_assert_contains "$output" 'information is missing' 'approval refusal was not actionable'
 
   jq '.title = "Decision plan" | .unresolved_decisions = [{id:"delivery-choice", question:"Which delivery policy applies?", blocking:true}]' \
-    "$repo_root/contracts/plan/examples/direct-plan.json" >"$decision"
+    "$repo_root/src/contracts/plan/examples/direct-plan.json" >"$decision"
   output=$(FOREMAN_HOME="$home" "$foreman" plan create --project plan-project --file "$decision") \
     || test_fail 'blocking-decision proposal creation failed'
   decision_id=$(plan_id_from_output "$output")
@@ -190,7 +190,7 @@ test_approval_blocks_incomplete_plans_and_updates_complete_plans() {
   test_assert_contains "$output" 'blocking decision is unresolved' \
     'blocking-decision refusal was not actionable'
 
-  jq '.title = "Clean approval plan"' "$repo_root/contracts/plan/examples/direct-plan.json" >"$clean"
+  jq '.title = "Clean approval plan"' "$repo_root/src/contracts/plan/examples/direct-plan.json" >"$clean"
   output=$(FOREMAN_HOME="$home" "$foreman" plan create --project plan-project --file "$clean") \
     || test_fail 'clean proposal creation failed'
   clean_id=$(plan_id_from_output "$output")
@@ -210,7 +210,7 @@ test_approval_blocks_incomplete_plans_and_updates_complete_plans() {
 
 test_plan_contract_documents_are_valid_json() {
   local file
-  for file in "$repo_root"/contracts/plan/*.json "$repo_root"/contracts/plan/examples/*.json; do
+  for file in "$repo_root"/src/contracts/plan/*.json "$repo_root"/src/contracts/plan/examples/*.json; do
     jq empty "$file" >/dev/null || test_fail "invalid plan contract JSON: $file"
   done
   test_pass 'plan contract documents are valid JSON'

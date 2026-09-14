@@ -2,7 +2,7 @@
 
 foreman_render_plan() {
   local plan_file=$1 project_file=$2 output_file=$3 css_file
-  css_file="$FOREMAN_SOURCE_ROOT/rendering/plan.css"
+  css_file="$FOREMAN_SOURCE_ROOT/src/artifacts/plan.css"
 
   [ -f "$css_file" ] || {
     printf 'foreman: plan: rendering style is missing: %s\n' "$css_file" >&2
