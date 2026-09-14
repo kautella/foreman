@@ -2,72 +2,90 @@
 
 ## Status
 
-Foreman is in Phase 1, producing a contained baseline of the pinned source reference.
+Phase 1 is complete on `feat/phase-1` and is awaiting maintainer review.
 
-The approved product contract, architecture, upstream map, Phase 1 backlog, and Project Brain routing are complete and live under `brain/`.
+Foreman has a tested foundation for project registration and reviewed plan intake. It intentionally cannot create task worktrees, launch or supervise workers, execute plans, deliver changes, merge, or tear down task environments yet.
 
-The active Foreman product skeleton exists with a neutral command surface, approved source layout, and portable test entry point. It intentionally exposes no worker, runtime, remote, or delivery operation. Source-validation tooling remains outside the repository because it is local implementation support, not part of Foreman.
+## Completed product foundation
 
-## Completed
+- Established Foreman as an independent, provider-neutral execution-supervision project.
+- Added the neutral `foreman` command with help, version, `init`, `doctor`, and `plan` command families.
+- Created the approved `bin/`, `lib/`, `contracts/`, `adapters/`, `rendering/`, `tests/`, and `docs/` structure.
+- Added strict versioned JSON schemas for global configuration, project configuration, worker profiles, direct plan input, external handover, canonical plans, adapter manifests, adapter requests, and adapter results.
+- Kept the supported agent set closed to Claude Code, Codex CLI, Gemini CLI, OpenCode, and Pi.
+- Added contract-only manifests for those five agents, tmux, Herdr, GitHub, and GitLab without representing any provider as implemented.
+- Kept provider host matching inside remote-adapter boundaries and rejected unknown identities, operations, capabilities, and malformed results.
 
-- Defined Foreman as an independent, provider-neutral execution-supervision system.
-- Approved the product requirements, architecture, source-provenance policy, and Phase 1 backlog.
-- Established the initial supported agent adapters, runtime adapters, remote adapters, and delivery-policy boundaries.
-- Defined reviewed plan intake for direct plans, external handovers, and guided drafting.
-- Defined durable standalone HTML artifacts for plan review and research reports.
-- Defined selective ongoing FirstMate intake without automatic adoption.
-- Recorded FirstMate baseline `3f035336f9df7331e195bc6279cc1577e1cf4b49` as the reproducible initial source revision.
-- Recorded that upstream `AGENTS.md` is intentionally excluded from Foreman.
-- Moved the canonical project contract into the Project Brain and aligned the Brain's vision, focus, and routing.
-- Added Foreman-owned repository guidance, public documentation, contributor guidance, local IDE exclusions, and the initial development-check runner and pre-commit hook.
-- Reviewed the initialized repository baseline: its documentation links and terminology boundaries are coherent, all untracked files are intentional, and the configured checks pass.
-- Created the initial repository commit `1cde061`.
-- Completed F1-001: verified the pinned FirstMate revision as an external development reference, recorded its MIT license, full source inventory, archive checksum, and excluded upstream `AGENTS.md` from Foreman instruction surfaces. No source snapshot is tracked in this repository.
-- Completed F1-002 outside the repository: established a local disposable-repository harness with validated temporary roots, exact root and control markers, isolated home and temporary paths, exact revision verification, interruption cleanup, and fail-closed deletion.
-- Reproduced the historical fixture helper's command-substitution self-deletion at `d0461e4b489c518eb744430742af62d73e2a16d0` only inside the disposable harness.
-- Verified that the pinned source revision `3f035336f9df7331e195bc6279cc1577e1cf4b49` preserves the fixture root for the same behavioral check.
-- Verified containment behavior for normal execution, broad and ambiguous path refusal, ownership-marker tampering, checkout self-deletion, control-directory survival, and signal interruption.
-- Completed F1-004: established the active `bin/`, `lib/`, `contracts/`, `adapters/`, `rendering/`, `tests/`, and `docs/` layout.
-- Added the neutral `foreman` command with stable help, version output, clear refusal of unknown commands, and no inherited executable or compatibility path.
-- Added a portable Foreman-owned test runner and initial command-surface tests.
-- Completed F1-005: added strict versioned JSON schemas and runtime validation for global configuration, project configuration, and worker profiles.
-- Configuration now requires canonical project and worktree paths, Git identity, explicit agent/model/reasoning selection, runtime, delivery policy, merge authority, and validation requirements.
-- Contract checks reject unknown fields, unsupported agent identities, duplicate validation commands, and remote delivery or merge authority for local-only projects.
-- Implemented the core of F1-006: `foreman init` gathers or prompts for every required project and worker choice, renders the proposed global and effective project configuration, requires explicit confirmation, and persists only accepted configuration.
-- Added read-only Git repository and remote detection, including explicit remote selection when multiple remotes are present and an explicit provider override for supported self-hosted GitLab repositories.
-- Added `foreman doctor` for core prerequisite, global configuration, project configuration, and live repository-identity diagnostics.
-- Completed the F1-007 path and state foundation: canonical absolute paths, non-overlapping home/project/worktree/Git roots, direct symbolic-link refusal, unique repository registration, atomic private configuration writes, and fail-closed malformed or unsupported configuration.
-- Verified that rejected or incomplete initialization creates no Foreman home and that remote detection does not mutate repository configuration.
-- Completed F1-006: initialization now validates configured agent and runtime identities, required profile capabilities, and executable availability through adapter-owned manifests; automated remote delivery additionally requires an available remote adapter.
-- Completed F1-010: added strict versioned manifests for the five approved agents, two runtimes, and two remotes, plus normalized adapter request and result contracts.
-- Adapter contract validation rejects unknown identities, undeclared operations, malformed or contradictory results, and diagnostic-free failures.
-- Public remote host matching now lives inside the applicable remote adapter boundary. Self-hosted GitLab selection remains an explicit initialization choice.
-- Adapter manifests remain marked `contract-only`; they describe intended operations without claiming worker, runtime, or remote implementations.
+## Completed initialization and safety
 
-## Not started
+- Implemented reviewed project initialization that obtains the project name and root, exact Git identity, worker agent, model, reasoning level, runtime, worktree root, delivery policy, merge authority, validation requirements, and remote selection where applicable.
+- Rendered the complete proposed global and project configuration before persistence and required explicit confirmation.
+- Added read-only Git and remote detection. Remote presence never grants mutation authority.
+- Added canonical absolute-path handling and rejected broad, relative, traversing, symbolic-link, nested, overlapping, duplicate, or identity-conflicting locations.
+- Added atomic private configuration writes and fail-closed validation for malformed or unsupported state.
+- Ensured rejected or incomplete initialization creates no Foreman home.
+- Added `foreman doctor` checks for prerequisites, configuration, repository identity, paths, and selected contract identities.
 
-- The pinned source baseline report.
-- Plan intake, adapter contracts, task lifecycle, and provider implementations.
-- The first upstream discovery record.
+## Completed plan gateway
 
-## Confirmed risk
+- Added a human plan template, strict direct-plan and handover schemas, examples, normalization rules, diagnostics, and unresolved-decision handling.
+- Implemented direct-plan intake, external handover, and guided drafting as three inputs to the same canonical plan contract.
+- Added deterministic plan IDs and duplicate protection.
+- Stored canonical plan JSON and rendered a standalone semantic `plan-{slug}.html` file with embedded CSS and escaped input.
+- Prevented plan input from increasing project delivery or merge authority.
+- Blocked invalid dependencies, dependency cycles, missing information, unresolved blocking decisions, and incomplete plans.
+- Required explicit approval of the exact stored plan and recorded approval without creating tasks or starting work.
 
-The historical fixture helper removed a newly created fixture root when called through command substitution because its exit trap ran in the subshell. The pinned revision contains an upstream repair.
+## Completed boundaries and development checks
 
-The external disposable-repository harness contains accidental mutation by relocating the checkout and common home and temporary paths, but it is not an operating-system security sandbox. Inherited source is treated as trusted-but-risky test code, never as hostile code.
+- Added active-code scans that reject prohibited source terminology, compatibility paths, local source-reference paths, unexpected nested instructions, and direct provider invocation outside adapters.
+- Added portable checks for the command surface, configuration contracts, initialization, path and state safety, plan review, adapter contracts, and source boundaries.
+- Added JSON validation, Bash syntax validation, whitespace checks, IDE metadata checks, contributor guidance, and a pre-commit hook that cleanly calls the shared check runner.
+- Verified all seven portable test files, the boundary scan, all tracked JSON, Bash syntax, and diff checks.
+- Verified the active shell sources with pinned ShellCheck 0.11.0 before the final documentation-only readiness update.
 
-No inherited test suite may run in the Foreman checkout, the source reference, or another non-disposable repository. Inherited results are source-baseline evidence only and never become Foreman behavior evidence by implication.
+## Completed source and upstream evidence
 
-## Current constraints
+- Verified the pinned FirstMate revision `3f035336f9df7331e195bc6279cc1577e1cf4b49` as an external development reference, including its repository identity, MIT license, complete archive inventory, and archive checksum.
+- Excluded the upstream root `AGENTS.md` from the inert reference so it cannot become a Foreman instruction surface.
+- Kept the source snapshot, manifest, validation harness, test output, reports, and external reference location outside this repository.
+- Reproduced the historical fixture cleanup defect only in a marked disposable repository and confirmed the pinned revision preserves the fixture root.
+- Verified the disposable harness refuses broad, ambiguous, unowned, or tampered cleanup targets and preserves its control directory during normal and interrupted runs.
+- Parsed 304 source shell files with no syntax failures and completed the source's pinned ShellCheck and workflow lint successfully.
+- Mapped all 152 source tests: 140 portable scripts and 12 separately gated Herdr tests.
+- Ran all 140 portable source tests in disposable clones. Of those, 129 passed and 11 failed; 25 expected environment or live gates were skipped within the executed scripts.
+- Re-ran all 11 failures in a fresh disposable clone and reproduced every failure identically.
+- Classified the failures into harness limitations, a missing prerequisite gate, relevant source safety defects, and defects in features excluded from Foreman. These are source evidence only, not Foreman failures.
+- Completed the first ongoing upstream discovery review over 201 commits after the pin through `b182d0f908b78d08c7ccb8dce3775bdca8c5d657`.
+- Routed useful compatibility, locking, teardown, delivery-truth, recovery, worker-profile, and testing lessons to future Foreman phases. No upstream change was imported automatically.
+- Produced standalone external HTML reports for the source baseline, upstream intake, and Phase 1 readiness review.
 
-- No external source reference is active Foreman code, instructions, configuration, or test input.
-- No capability is represented as supported without implementation and verification evidence.
-- No provider executable may be invoked from the Foreman core.
-- No upstream change bypasses the approved intake, planning, validation, and delivery process.
-- Ambiguous identity, ownership, liveness, delivery, or landing state must preserve work and block mutation.
+## Phase 1 verification
+
+All F1-001 through F1-014 acceptance areas have evidence:
+
+- provenance and instruction exclusion;
+- disposable test containment;
+- source syntax, lint, tool, coverage, gated-test, and failure classification;
+- active Foreman structure and command namespace;
+- strict configuration and reviewed initialization;
+- path, identity, and atomic-state safety;
+- plan exchange, HTML review, and explicit approval;
+- adapter contracts and provider boundaries;
+- development checks and contributor workflow;
+- selective upstream intake;
+- final readiness assessment.
+
+No unresolved Phase 1 blocker remains.
+
+## Confirmed risks carried forward
+
+- Worktree creation, execution, supervision, delivery, recovery, and teardown are inherently higher-risk and require new Phase 2 evidence before use.
+- Stock macOS Bash 3.2 behavior must remain an explicit compatibility target, especially for arrays, subshell ownership, locking, and fixture data.
+- Runtime socket paths must be bounded before the Herdr adapter is implemented.
+- Destructive lifecycle operations must require exact ownership, prerequisite, liveness, and landing evidence and must fail closed when any is ambiguous.
+- Remote delivery must distinguish command success from provider-confirmed outcome and keep merge authority independent from delivery automation.
 
 ## Next verified checkpoint
 
-Complete F1-003: produce a trustworthy source-baseline report through the validated disposable-repository harness. Separate syntax and lint evidence, portable test results, environment-gated checks, harness defects, and product defects.
-
-Complete F1-008 and F1-009: converge all plan-intake paths on canonical validated JSON, render standalone HTML review, and require explicit approval.
+Complete maintainer review of the Phase 1 branch and reports. Then draft and approve the Phase 2 backlog for the local-only Codex CLI and tmux vertical slice before implementing task execution.
