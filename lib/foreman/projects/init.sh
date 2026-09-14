@@ -93,8 +93,8 @@ foreman_init_check_existing_identity() {
 }
 
 foreman_init_command() {
-  local name= project_input= agent= model= reasoning= runtime= worktree_input=
-  local remote_name= remote_provider= delivery_policy= merge_authority= yes=0
+  local name='' project_input='' agent='' model='' reasoning='' runtime='' worktree_input=''
+  local remote_name='' remote_provider='' delivery_policy='' merge_authority='' yes=0
   local home projects_root global_file global_exists=0 slug repository git_top git_common_dir
   local project_root worktree_root temporary global_proposal project_proposal confirmation
   local default_profile default_runtime default_worktree_root validation_json command

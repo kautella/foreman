@@ -98,7 +98,10 @@ foreman_remote_detect() {
     foreman_adapter_require remote "$provider_override" >/dev/null || return 1
     FOREMAN_REMOTE_PROVIDER=$provider_override
   else
-    FOREMAN_REMOTE_PROVIDER=$(foreman_remote_provider_for_host "$FOREMAN_REMOTE_HOST") \
-      || FOREMAN_REMOTE_PROVIDER=unsupported
+    if ! FOREMAN_REMOTE_PROVIDER=$(foreman_remote_provider_for_host "$FOREMAN_REMOTE_HOST"); then
+      # Consumed by the caller after this file is sourced.
+      # shellcheck disable=SC2034
+      FOREMAN_REMOTE_PROVIDER=unsupported
+    fi
   fi
 }

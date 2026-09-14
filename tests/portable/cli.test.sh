@@ -2,7 +2,7 @@
 
 set -u
 
-repo_root="$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)"
+repo_root="$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd)"
 foreman="$repo_root/bin/foreman"
 # shellcheck source=tests/test-helper.sh
 . "$repo_root/tests/test-helper.sh"

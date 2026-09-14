@@ -18,7 +18,7 @@ foreman_doctor_check_command() {
 }
 
 foreman_doctor_command() {
-  local home requested_project= status=0 global project_file projects_root expected_projects_root
+  local home requested_project='' status=0 global project_file projects_root expected_projects_root
   local repository stored_repository git_common_dir stored_git_common_dir worktree_root stored_worktree_root stored_slug
   local agent runtime delivery_policy remote_provider
 

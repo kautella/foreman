@@ -40,7 +40,7 @@ foreman_path_canonicalize() {
       foreman_path_error "path is not a directory: $requested"
       return 1
     }
-    (CDPATH= cd -P -- "$requested" 2>/dev/null && pwd -P) || {
+    (CDPATH='' cd -P -- "$requested" 2>/dev/null && pwd -P) || {
       foreman_path_error "path cannot be resolved: $requested"
       return 1
     }
@@ -63,7 +63,7 @@ foreman_path_canonicalize() {
     foreman_path_error "path ancestor is not a directory: $cursor"
     return 1
   }
-  physical=$(CDPATH= cd -P -- "$cursor" 2>/dev/null && pwd -P) || {
+  physical=$(CDPATH='' cd -P -- "$cursor" 2>/dev/null && pwd -P) || {
     foreman_path_error "path ancestor cannot be resolved: $cursor"
     return 1
   }

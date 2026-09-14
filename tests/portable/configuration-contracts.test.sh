@@ -2,7 +2,7 @@
 
 set -u
 
-repo_root="$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)"
+repo_root="$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd)"
 FOREMAN_SOURCE_ROOT=$repo_root
 export FOREMAN_SOURCE_ROOT
 # shellcheck source=lib/foreman/configuration/validate.sh

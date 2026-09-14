@@ -2,7 +2,7 @@
 
 set -u
 
-repo_root="$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)"
+repo_root="$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd)"
 foreman="$repo_root/bin/foreman"
 # shellcheck source=tests/test-helper.sh
 . "$repo_root/tests/test-helper.sh"
@@ -51,7 +51,7 @@ test_reviewed_initialization_persists_exact_configuration() {
   home="$test_root/home-success"
   project="$test_root/project-success"
   create_repository "$project"
-  project_canonical=$(CDPATH= cd -P -- "$project" && pwd -P)
+  project_canonical=$(CDPATH='' cd -P -- "$project" && pwd -P)
 
   output=$(init_project "$home" "$project" 'Example Project') \
     || test_fail 'valid initialization failed'
