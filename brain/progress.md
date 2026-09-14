@@ -45,7 +45,6 @@ Foreman has a tested foundation for project registration and reviewed plan intak
 - Added portable installation checks for launcher generation, safe refresh, linked invocation, and refusal to overwrite an unowned launcher.
 - Added JSON validation, Bash syntax validation, whitespace checks, IDE metadata checks, contributor guidance, and a pre-commit hook that cleanly calls the shared check runner.
 - Verified all eight portable test files, the boundary scan, all tracked JSON, Bash syntax, generated-launcher ignore status, and diff checks.
-- Verified the active shell sources with pinned ShellCheck 0.11.0 before the final documentation-only readiness update.
 
 ## Completed source and upstream evidence
 
