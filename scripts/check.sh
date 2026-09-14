@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-repo_root="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+repo_root="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
 cd "$repo_root"
 
 failed=0
@@ -91,6 +91,14 @@ fi
 check_json_files
 check_bash_files
 check_tracked_ide_metadata
+
+if ! "$repo_root/scripts/check-boundaries.sh"; then
+  failed=1
+fi
+
+if ! "$repo_root/scripts/test.sh"; then
+  failed=1
+fi
 
 if [ "$failed" -ne 0 ]; then
   exit 1
