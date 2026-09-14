@@ -10,6 +10,8 @@
 . "$FOREMAN_SOURCE_ROOT/lib/foreman/configuration/validate.sh"
 # shellcheck source=lib/foreman/adapters/registry.sh
 . "$FOREMAN_SOURCE_ROOT/lib/foreman/adapters/registry.sh"
+# shellcheck source=lib/foreman/text.sh
+. "$FOREMAN_SOURCE_ROOT/lib/foreman/text.sh"
 
 foreman_init_usage() {
   cat <<'EOF'
@@ -49,15 +51,10 @@ foreman_init_prompt_required() {
 }
 
 foreman_init_slug() {
-  local name=$1 slug
-  slug=$(printf '%s' "$name" |
-    LC_ALL=C tr '[:upper:]' '[:lower:]' |
-    LC_ALL=C sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')
-  [ -n "$slug" ] || {
+  foreman_slugify "$1" || {
     foreman_init_die 'project name does not produce a storage-safe slug'
     return 1
   }
-  printf '%s\n' "$slug"
 }
 
 foreman_init_absolute_input() {
