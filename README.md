@@ -40,6 +40,8 @@ A capability is not considered supported until it has implementation and verific
 
 ## Project documentation
 
+To try the currently implemented initialization and plan-review surface, see [Getting started](docs/getting-started.md).
+
 The canonical project documentation lives in [`brain/`](brain/README.md):
 
 - [Vision](brain/vision.md)
