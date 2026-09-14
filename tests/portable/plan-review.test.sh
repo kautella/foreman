@@ -161,8 +161,9 @@ test_guided_drafting_creates_a_reviewable_proposal() {
 }
 
 test_approval_blocks_incomplete_plans_and_updates_complete_plans() {
-  local blocked clean output blocked_id clean_id status clean_plan review
+  local blocked decision clean output blocked_id decision_id clean_id status clean_plan review
   blocked="$test_root/blocked.json"
+  decision="$test_root/decision.json"
   clean="$test_root/clean.json"
   jq '.title = "Blocked plan" | .missing_information = ["Required API behavior"]' \
     "$repo_root/contracts/plan/examples/direct-plan.json" >"$blocked"
@@ -175,6 +176,19 @@ test_approval_blocks_incomplete_plans_and_updates_complete_plans() {
   set -e
   [ "$status" -ne 0 ] || test_fail 'plan with missing information was approved'
   test_assert_contains "$output" 'information is missing' 'approval refusal was not actionable'
+
+  jq '.title = "Decision plan" | .unresolved_decisions = [{id:"delivery-choice", question:"Which delivery policy applies?", blocking:true}]' \
+    "$repo_root/contracts/plan/examples/direct-plan.json" >"$decision"
+  output=$(FOREMAN_HOME="$home" "$foreman" plan create --project plan-project --file "$decision") \
+    || test_fail 'blocking-decision proposal creation failed'
+  decision_id=$(plan_id_from_output "$output")
+  set +e
+  output=$(FOREMAN_HOME="$home" "$foreman" plan approve --project plan-project --plan "$decision_id" --yes 2>&1)
+  status=$?
+  set -e
+  [ "$status" -ne 0 ] || test_fail 'plan with a blocking unresolved decision was approved'
+  test_assert_contains "$output" 'blocking decision is unresolved' \
+    'blocking-decision refusal was not actionable'
 
   jq '.title = "Clean approval plan"' "$repo_root/contracts/plan/examples/direct-plan.json" >"$clean"
   output=$(FOREMAN_HOME="$home" "$foreman" plan create --project plan-project --file "$clean") \
