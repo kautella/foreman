@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "project": {
+    "name": "Example Project",
+    "slug": "example-project",
+    "repository_path": "/home/user/Projects/example-project",
+    "git_common_dir": "/home/user/Projects/example-project/.git"
+  },
+  "worktree_root": "/home/user/.foreman/projects/example-project/worktrees",
+  "remote": {
+    "provider": "none",
+    "name": null,
+    "url": null,
+    "host": null,
+    "repository": null
+  },
+  "worker_profile": {
+    "agent": "codex",
+    "model": "example-model",
+    "reasoning": "high"
+  },
+  "runtime": "tmux",
+  "delivery": {
+    "policy": "draft-handoff",
+    "merge_authority": false
+  },
+  "validation": {
+    "commands": [
+      "./scripts/check.sh"
+    ],
+    "require_clean_worktree": true
+  }
+}

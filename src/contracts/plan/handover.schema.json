@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foreman.local/contracts/plan/handover.schema.json",
+  "title": "Foreman external plan handover",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["handover_version", "source", "plan"],
+  "properties": {
+    "handover_version": {"const": 1},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "reference"],
+      "properties": {
+        "system": {"type": "string", "minLength": 1},
+        "reference": {"type": "string", "minLength": 1}
+      }
+    },
+    "plan": {"$ref": "input.schema.json"}
+  }
+}

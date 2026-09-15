@@ -1,0 +1,36 @@
+{
+  "handover_version": 1,
+  "source": {
+    "system": "planning-agent",
+    "reference": "conversation-123"
+  },
+  "plan": {
+    "schema_version": 1,
+    "title": "Investigate configuration recovery",
+    "objective": "Determine how configuration recovery should preserve ambiguous state.",
+    "scope": {
+      "included": ["Configuration recovery behavior"],
+      "excluded": ["Implementing recovery"]
+    },
+    "constraints": ["Research must not mutate the managed repository"],
+    "tasks": [
+      {
+        "id": "recovery-research",
+        "type": "research",
+        "title": "Research recovery behavior",
+        "objective": "Produce a durable recommendation for configuration recovery.",
+        "depends_on": [],
+        "acceptance_criteria": ["The report distinguishes confirmed behavior from recommendations."],
+        "validation": [],
+        "delivery_expectation": "project-default",
+        "worker_profile_hint": null
+      }
+    ],
+    "acceptance_criteria": ["A standalone research report is ready for review."],
+    "assumptions": [],
+    "risks": [],
+    "missing_information": [],
+    "unresolved_decisions": [],
+    "references": []
+  }
+}

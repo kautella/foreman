@@ -1,0 +1,11 @@
+{
+  "contract_version": 1,
+  "kind": "agent",
+  "id": "claude",
+  "display_name": "Claude Code",
+  "executable": "claude",
+  "status": "contract-only",
+  "operations": ["diagnose", "validate-profile", "launch", "resume", "inspect", "interrupt"],
+  "capabilities": {"model_selection": true, "reasoning_selection": true, "resume": true},
+  "profile": {"model_required": true, "reasoning_required": true, "validation": "provider-adapter"}
+}

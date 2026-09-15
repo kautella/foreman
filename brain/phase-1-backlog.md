@@ -16,16 +16,17 @@ At exit, Foreman can:
 5. Render a standalone `plan-{slug}.html` review artifact.
 6. Require explicit approval before any future task initialization.
 7. Validate built-in adapter contracts without invoking provider executables from the core.
-8. Preserve an auditable, inert FirstMate baseline and safe test evidence.
+8. Use a verified external FirstMate reference and safe test evidence.
+9. Support both Codex-operated checkout use and direct executable use through one generated launcher and tracked implementation.
 
 It must not claim worker, runtime, remote, delivery, or merge functionality before those capabilities have implementation and evidence.
 
 ## Planning principles
 
 - The initial upstream source revision remains `3f035336f9df7331e195bc6279cc1577e1cf4b49`.
-- The imported source tree lives under `provenance/firstmate-baseline/`, outside active Foreman code paths and without Git history.
-- The upstream root `AGENTS.md` is deliberately not imported. Its path, blob identifier, and omission reason are recorded in the provenance manifest, but no upstream agent instructions enter the repository.
-- Foreman's active implementation begins in its approved target structure: `bin/`, `lib/`, `contracts/`, `adapters/`, `rendering/`, and `tests/`.
+- The FirstMate source baseline is an external development reference. No copied source tree, source instruction, source state, or reference location is committed to this repository.
+- The upstream root `AGENTS.md` must never enter a Foreman instruction surface.
+- Foreman's active implementation lives under `src/`, with developer and installation utilities under `scripts/` and validation under `tests/`.
 - `jq`, Bash, and Git are initial core prerequisites.
 - JSON is the only configuration and mechanically consumed state format.
 - The active codebase contains no FirstMate terminology, compatibility aliases, or provider calls outside their adapters.
@@ -35,18 +36,18 @@ It must not claim worker, runtime, remote, delivery, or merge functionality befo
 
 | ID | Work | Acceptance criteria |
 |---|---|---|
-| F1-001 | Establish provenance baseline | Add `NOTICE.md`; retain the MIT notice; record source URL, pinned revision, source archive checksum, import procedure, and inventory. Store the full source tree under `provenance/firstmate-baseline/`, except upstream `AGENTS.md`; record that omission in the manifest. No active Foreman code imports or executes the provenance tree. |
+| F1-001 | Verify external source reference | Verify the source URL, pinned revision, license, archive checksum, and full inventory outside the Foreman repository. Exclude upstream `AGENTS.md` from Foreman instruction surfaces. Do not commit a source snapshot, source instructions, source state, or external reference location. |
 | F1-002 | Contain inherited test execution | Reproduce the existing fixture-cleanup risk only in an expendable clone. Define validated temporary roots, exact ownership markers, control-directory survival checks, interruption cleanup, and refusal for broad or ambiguous paths. |
 | F1-003 | Produce a trustworthy baseline report | Record syntax, portable-test, lint, tool-version, and known-failure evidence for the pinned source revision. Separate harness defects, gated tests, and product defects. |
-| F1-004 | Create the active Foreman skeleton | Establish the approved active layout, neutral CLI surface, Foreman-owned root project instructions, test layout, and documentation routing. No FirstMate executable path or instruction becomes an active Foreman surface. |
+| F1-004 | Create the active Foreman skeleton | Establish the approved `src/` implementation layout, neutral CLI surface, Foreman-owned root project instructions, generated root launcher, test layout, and documentation routing. Codex can operate from the checkout, and external callers can use the same executable surface. No FirstMate executable path or instruction becomes an active Foreman surface. |
 | F1-005 | Define configuration contracts | Create strict versioned schemas for global and project JSON configuration, including project identity, canonical paths, worker profile, runtime, delivery policy, merge authority, and validation requirements. |
 | F1-006 | Implement reviewed initialization | Implement `foreman init` and `foreman doctor`. Initialization canonicalizes the target path, detects Git and remote capability read-only, resolves missing worker-profile choices, renders effective configuration, and persists only after explicit confirmation. |
 | F1-007 | Implement path and state safety | Reject unsafe home, project, worktree, symlink, nested-root, and identity combinations. Use atomic writes and fail closed on malformed or unsupported configuration. |
 | F1-008 | Define plan-exchange contracts | Create the human plan template, machine-readable schema and example, external-handover envelope, normalization rules, validation diagnostics, and unresolved-decision model. |
 | F1-009 | Implement plan review | Create deterministic plan IDs, canonical `plan.json`, and standalone semantic `plan-{slug}.html` artifacts with embedded CSS. Plans remain unexecutable until explicit approval. |
 | F1-010 | Define adapter contracts | Create versioned agent, runtime, and remote adapter manifests plus normalized input and output contracts. The core validates identities, operations, capabilities, and structured results without direct provider calls. |
-| F1-011 | Enforce active-code boundaries | Add provider-boundary, prohibited-terminology, inactive-provenance, and compatibility-path scans. Scans cover shell, Python, JavaScript, TypeScript, instructions, hooks, schemas, and fixtures. |
-| F1-012 | Establish development checks | Add repository-appropriate pre-commit checks, portable test entry points, formatting and syntax validation, and a contributor workflow for safe fixtures, schemas, and adapter boundaries. |
+| F1-011 | Enforce active-code boundaries | Add provider-boundary, prohibited-terminology, external-source, and compatibility-path scans. Scans cover shell, Python, JavaScript, TypeScript, instructions, hooks, schemas, and fixtures. |
+| F1-012 | Establish development checks | Add repository-appropriate pre-commit checks, portable test entry points, formatting and syntax validation, installer and launcher safety tests, and a contributor workflow for safe fixtures, schemas, and adapter boundaries. |
 | F1-013 | Start upstream intake | Create the first read-only upstream discovery record covering changes after `3f03533`. Classify findings as adopt, defer, decline, or inform, without importing later changes automatically. |
 | F1-014 | Produce Phase 1 readiness evidence | Produce an HTML readiness report confirming provenance, containment, initialization, plan review, contract validation, boundary scans, and all remaining blockers. |
 
@@ -72,8 +73,8 @@ F1-003 must complete before any inherited source test becomes evidence for Forem
 
 ## Phase 1 exit criteria
 
-- The pinned FirstMate source and its license are auditable, but inert.
-- Upstream `AGENTS.md` is absent, and all active Foreman project instructions are Foreman-owned.
+- The pinned FirstMate source reference and its license are auditable without a copied source tree in the repository.
+- Upstream `AGENTS.md` is absent from Foreman instruction surfaces, and all active Foreman project instructions are Foreman-owned.
 - Destructive inherited tests are contained in disposable environments.
 - Foreman configuration is schema-validated, path-safe, atomically persisted, and explicitly confirmed.
 - Direct plans, external handovers, and guided drafting produce validated canonical plan JSON.
@@ -81,6 +82,7 @@ F1-003 must complete before any inherited source test becomes evidence for Forem
 - The core validates adapter contracts without directly invoking agent, runtime, or remote executables.
 - Boundary scans reject active nautical terminology, FirstMate compatibility paths, and direct provider calls outside adapters.
 - Development checks and contributor guidance are active.
+- The ignored root launcher is reproducibly generated, safely refreshed, usable through an explicit external link, and refuses unowned replacement targets.
 - The first ongoing-upstream intake record exists.
 - No Phase 2 blocker is unresolved.
 

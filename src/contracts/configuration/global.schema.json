@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foreman.local/contracts/configuration/global.schema.json",
+  "title": "Foreman global configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "projects_root",
+    "defaults"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "projects_root": {
+      "type": "string",
+      "pattern": "^/"
+    },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "worker_profile",
+        "runtime",
+        "worktree_root",
+        "delivery_policy",
+        "merge_authority"
+      ],
+      "properties": {
+        "worker_profile": {
+          "oneOf": [
+            {
+              "$ref": "worker-profile.schema.json"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "runtime": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "tmux",
+                "herdr"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "worktree_root": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^/"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "delivery_policy": {
+          "const": "draft-handoff"
+        },
+        "merge_authority": {
+          "const": false
+        }
+      }
+    }
+  }
+}

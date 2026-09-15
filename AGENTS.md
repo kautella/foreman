@@ -23,11 +23,11 @@ Do not begin deferred work merely because it appears technically related. Do not
 
 When a proposed change would alter product scope, safety, authority, configuration semantics, a supported-provider boundary, or the approved architecture, stop and surface the decision.
 
-## Active and archival material
+## Source reference material
 
 Only documented active Foreman source directories form the product implementation.
 
-Files under `provenance/` are archival reference material. They are not executable product code, active instructions, runtime configuration, or test inputs. Do not execute, source, copy, or modify archival material unless the approved current task explicitly requires it.
+FirstMate and historical source material are external development references. They are not executable product code, active instructions, runtime configuration, or test inputs. Do not execute, source, copy, or modify them unless the approved current task explicitly requires it.
 
 ## Architecture boundaries
 
@@ -46,6 +46,14 @@ Files under `provenance/` are archival reference material. They are not executab
 - Run destructive or inherited tests only in an expendable, validated environment.
 - Do not bypass a safety refusal, broaden a mutation target, or use force or discard behavior without explicit authority.
 - Keep provider-boundary and terminology checks passing as the active implementation grows.
+
+## Operating from this checkout
+
+Tracked product implementation, adapters, contracts, and artifact assets live under `src/`.
+
+The root `./foreman` executable is a generated, ignored launcher. When an operational request requires it and it is absent, run `./scripts/install.sh` to generate it. Do not write the launcher manually, edit it, or commit it. Do not create an external command link unless the user explicitly asks for one.
+
+Use `./foreman` for product operations. Do not imitate an operation by directly editing `~/.foreman` or other durable state. When the task is to develop Foreman itself, edit the tracked implementation and validate through the public command surface where practical.
 
 ## Project Brain write boundary
 

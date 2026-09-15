@@ -2,51 +2,53 @@
 
 ## Current objective
 
-Complete Foreman's project initialization, establish its first intentional repository baseline, and begin Phase 1: safe provenance, contained inherited-test evidence, reviewed configuration, plan intake, and enforceable architecture boundaries.
+Review the completed Phase 1 foundation and its readiness evidence before defining Phase 2 implementation work.
 
 ## Established state
 
-The following documents are approved and define the current project contract:
+The following approved documents remain the project contract:
 
+- `vision.md`
 - `prd.md`
 - `architecture.md`
 - `upstream-map.md`
 - `phase-1-backlog.md`
-- `brain/vision.md`
 
-No active Foreman implementation exists yet.
+Phase 1 is complete on the feature branch. Foreman now provides:
 
-No FirstMate source has been imported, executed, or adopted as active Foreman code. No Foreman operational home, project configuration, task state, adapter implementation, worktree, worker, or remote-delivery path exists yet.
+- a single tracked product tree under `src/`, a generated ignored root launcher, and a safe installer with an optional explicit executable-directory link;
+- a neutral command surface with `init`, `doctor`, and reviewed `plan` workflows;
+- strict versioned configuration, plan, handover, and adapter contracts;
+- reviewed, atomic project initialization with Git identity and path-safety checks;
+- direct-plan, external-handover, and guided-drafting intake that converges on canonical JSON;
+- deterministic plan identity, standalone always-dark HTML review, blocking-decision handling, and explicit approval;
+- contract-only definitions for the approved agent, runtime, and remote adapters;
+- active-code boundary scans, portable tests, syntax and data validation, contributor guidance, and a clean pre-commit entry point;
+- external source-baseline, upstream-intake, and Phase 1 readiness evidence.
 
-The historical planning material outside this repository is no longer a project contract. It may be consulted only as source evidence when the approved documents require it.
+The source reference remains pinned at `3f035336f9df7331e195bc6279cc1577e1cf4b49`. Its archive, license, inventory, contained tests, and known failures are recorded outside this repository. The first ongoing upstream discovery review covers 201 later commits through `b182d0f908b78d08c7ccb8dce3775bdca8c5d657` without automatically importing any change.
 
-## Current sequence
+## Review boundary
 
-1. Complete the Project Brain reconciliation.
-2. Add repository-local operating guidance and appropriate initial development checks.
-3. Review the initialized repository as one coherent baseline.
-4. Create the first project commit.
-5. Begin Phase 1 in the order defined by `phase-1-backlog.md`.
+The current branch is ready for maintainer review. Phase 2 has not started.
 
-## Immediate Phase 1 priorities
+The review should confirm:
 
-1. Preserve the pinned FirstMate baseline, attribution, source inventory, and intentional omission of upstream `AGENTS.md`.
-2. Reproduce and contain inherited test cleanup only in expendable environments.
-3. Establish the active Foreman repository layout and neutral command namespace.
-4. Implement strict JSON configuration, reviewed project initialization, and path safety.
-5. Implement plan intake, normalization, approval, and standalone HTML plan review.
-6. Define adapter contracts and enforce core, adapter, provider, terminology, and provenance boundaries.
-7. Begin the standing upstream-intake process without automatically adopting later changes.
+1. The initialization choices and rendered configuration match the intended user experience.
+2. The three plan-intake routes and explicit approval boundary are the correct gateway to future execution.
+3. The source-baseline failure classifications and upstream adoption candidates are reasonable.
+4. The Phase 1 implementation is ready to become the base for Phase 2 planning.
+5. The clone-and-operate and direct-executable access modes are clear, safe, and backed by the same implementation.
 
 ## Constraints
 
-- The source baseline remains `3f035336f9df7331e195bc6279cc1577e1cf4b49`.
-- Upstream `AGENTS.md` is excluded from the source import and from all Foreman instruction surfaces.
-- Inherited tests must not run in the Foreman checkout or any non-disposable repository.
+- Phase 1 does not create task worktrees, launch workers, execute approved plans, or mutate remotes.
+- Agent, runtime, and remote manifests remain `contract-only`; they do not claim provider support.
 - No provider executable may be invoked from the Foreman core.
-- No agent, runtime, remote, delivery, or merge capability is considered implemented until its contracts and evidence exist.
-- Upstream changes are evaluated through the approved intake process. They do not bypass the Phase 1 sequence.
+- No external source reference is active Foreman code, instructions, configuration, or test input.
+- Upstream changes remain subject to explicit intake, architecture review, Foreman-native implementation, and Foreman-owned evidence.
+- Ambiguous identity, ownership, liveness, delivery, or landing state must preserve work and block mutation.
 
 ## Next milestone
 
-The project is ready to move from documentation initialization into the first committed baseline. The first implementation milestone is the Phase 1 readiness report, not functional parity or worker execution.
+After maintainer review, define the Phase 2 backlog for the local-only Codex CLI and tmux vertical slice. Do not begin worker execution, worktree allocation, delivery, recovery, or teardown implementation before that plan is approved.

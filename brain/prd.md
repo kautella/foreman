@@ -37,6 +37,7 @@ Foreman must:
 10. Retain Bash during the initial parity and extraction work.
 11. Maintain a configurable Foreman home with global configuration and isolated, durable state for each managed project.
 12. Accept, exchange, and guide the drafting of reviewable execution plans without taking ownership of product strategy or executing unapproved work.
+13. Provide the same command surface to Codex operating from a cloned checkout and to external callers invoking a Foreman executable.
 
 ## Delivery policy and merge authority
 
@@ -76,7 +77,7 @@ Local landing always remains user-controlled.
 A research task produces a durable, standalone `report-{slug}.html` document within the owning project's Foreman-managed task state under `projects/<project-name>/`.
 It does not write the report into the target repository unless the user explicitly directs that delivery.
 
-The report uses semantic HTML and embedded CSS only.
+The report uses semantic HTML and embedded CSS only. Its presentation is always dark and does not vary with the viewer's system theme.
 It has no external stylesheets, scripts, services, or session dependency, so it remains readable after the task and its runtime end.
 
 The report records:
@@ -109,6 +110,10 @@ Task metadata records the report's canonical path.
 ### Bootstrap and projects
 
 - Bootstrap works with Git plus one supported agent and runtime.
+- A cloned Foreman checkout is directly operable by Codex through repository instructions. If the repository-local `foreman` executable is absent, the tracked installer generates it before product operations begin.
+- `scripts/install.sh` generates an ignored `foreman` executable at the repository root. It may also create an explicitly requested link in an absolute user-selected executable directory. It never silently chooses or modifies an external executable directory.
+- The generated executable contains no product logic. It delegates to the tracked implementation under `src/`, and both repository-local and externally linked invocation use that same implementation.
+- Installation refuses to overwrite a root executable or external link it cannot prove it owns.
 - Foreman has a configurable home root, distinct from its source checkout and from managed repositories. A global configuration file in that root governs home-wide defaults and settings.
 - The Foreman home contains a `projects/` directory. Each managed project has an isolated `projects/<project-name>/` directory that contains its project configuration and all project-owned Foreman state.
 - Project initialization explicitly obtains a project name and target project folder. Foreman canonicalizes the target as an absolute path, verifies its Git identity, and binds that identity to the selected project name. It must not silently adopt the current working directory.
@@ -128,7 +133,7 @@ Task metadata records the report's canonical path.
 - Guided drafting may inspect registered project context read-only and ask focused questions. It must not create worktrees, launch workers, mutate a repository or remote, or execute work before explicit plan approval.
 - All accepted input is normalized into a versioned execution-plan JSON document that records scope, tasks and dependencies, constraints, acceptance criteria, delivery expectations, worker-profile hints, references, and unresolved decisions.
 - A plan's origin, including an external agent handover, is provenance only. It cannot grant delivery, merge, discard, or other authority beyond the registered project policy.
-- Foreman renders each proposed plan as a durable standalone `plan-{slug}.html` artifact using semantic HTML and embedded CSS. The review presents the proposed scope, tasks, dependencies, acceptance criteria, policy implications, risks, missing information, and unresolved decisions.
+- Foreman renders each proposed plan as a durable standalone `plan-{slug}.html` artifact using semantic HTML, embedded CSS, and an always-dark presentation that does not vary with the viewer's system theme. The review presents the proposed scope, tasks, dependencies, acceptance criteria, policy implications, risks, missing information, and unresolved decisions.
 - Explicit user approval of the reviewed plan is required before Foreman initializes its tasks.
 
 ### Task lifecycle
@@ -196,3 +201,4 @@ The initial stable release requires:
 7. No active FirstMate nautical theme, persona, terminology, or compatibility promise outside required attribution.
 8. Complete MIT attribution and auditable baseline provenance.
 9. Direct-plan, external-handover, and guided-drafting evidence, including approval refusal and standalone HTML plan review artifacts.
+10. Repository-local installation, safe refresh, unowned-file refusal, and explicitly selected external-link evidence.

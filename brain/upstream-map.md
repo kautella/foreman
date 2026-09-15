@@ -30,9 +30,9 @@ Foreman maintains a one-way, selective upstream-intake process. FirstMate remain
 
 The first intake review covers every relevant upstream change after the initial import pin. Later reviews cover the range from the last reviewed upstream revision to the newly observed revision.
 
-A separate read-only upstream mirror, outside the Foreman working tree, is the source of record for current upstream discovery. A local reference checkout is a convenience copy only.
+A separate read-only upstream mirror, outside the Foreman working tree, is the source of record for current upstream discovery. A local reference checkout is a convenience copy only. Neither is Foreman product state, runtime configuration, or a repository artifact.
 
-Foreman may import source code from the selected revision without importing Git history. The import must retain the upstream MIT copyright and permission notice, including `Copyright (c) 2026 Kun Chen`. `NOTICE.md` must identify FirstMate, the exact source revision, the import date, and the nature of Foreman's independent modifications.
+Foreman may adapt selected source behavior from the pinned reference without importing Git history or a full source snapshot. When source material is incorporated into Foreman-owned code, it must retain the upstream MIT copyright and permission notice, including `Copyright (c) 2026 Kun Chen`, where required by the license.
 
 ## 3. Migration rules
 
@@ -55,13 +55,13 @@ Foreman may import source code from the selected revision without importing Git 
 | Project clones and Treehouse worktree handling | Registered target repositories, optional explicit acquisition, and direct Git worktrees | Replace | Isolated task worktrees without a Treehouse dependency or competing worktree owner. |
 | Briefs, backlog handoffs, task inboxes | Versioned execution plans, task briefs, task results | Redesign | Direct plans, external handovers, and guided drafting converge on approved plan JSON. |
 | Markdown backlog | Optional human-readable task projection | Redesign/defer | Canonical plan and task state remain validated JSON; a Markdown view cannot become the authoritative machine record. |
-| Plan and task reports | `plan-{slug}.html`, `report-{slug}.html` | Add/redesign | Standalone semantic HTML with embedded CSS, stored in Foreman-owned project state. |
+| Plan and task reports | `plan-{slug}.html`, `report-{slug}.html` | Add/redesign | Standalone semantic HTML with embedded CSS and an always-dark presentation, stored in Foreman-owned project state. |
 | Spawn, watch, state classification, locks, wake queues, teardown | Foreman core lifecycle and contracts | Retain/redesign | Exact task identity, durable events, recovery, fail-closed ambiguity, and safe cleanup. |
-| tmux backend | `adapters/runtimes/tmux/` | Retain/redesign | Full lifecycle control and exact endpoint safety. |
-| Herdr backend and helpers | `adapters/runtimes/herdr/` | Retain/redesign | Version-gated lifecycle, recovery, and stability evidence. |
+| tmux backend | `src/adapters/runtimes/tmux/` | Retain/redesign | Full lifecycle control and exact endpoint safety. |
+| Herdr backend and helpers | `src/adapters/runtimes/herdr/` | Retain/redesign | Version-gated lifecycle, recovery, and stability evidence. |
 | Zellij, cmux, Orca, Codex App paths | None | Remove | No code, schema, tests, fixtures, docs, or fallback branches remain. |
 | Claude Code, Codex CLI, OpenCode, Pi harnesses | Built-in agent adapters | Retain/redesign | Adapter-owned discovery, launch, supervision, recovery, and profile validation. |
-| Gemini CLI | `adapters/agents/gemini/` | Add | Equivalent lifecycle support and live verification before release support. |
+| Gemini CLI | `src/adapters/agents/gemini/` | Add | Equivalent lifecycle support and live verification before release support. |
 | `pi-signed`, Grok, Kimi, Cursor, Muse | None | Remove | No adapter, compatibility shim, fixture, documentation, or runtime branch remains. |
 | GitHub PR scripts | GitHub remote adapter | Redesign | Policy-gated draft handoff, automated change-request delivery, status, and optional merge execution. |
 | Partial GitLab support | GitLab remote adapter | Redesign/add | GitLab.com and supported self-hosted GitLab lifecycle parity, including creation, pipeline status, and permitted merge execution. |
@@ -100,11 +100,11 @@ Treehouse is excluded from Foreman altogether. Its source behavior may inform Gi
 ## 7. Import and containment procedure
 
 1. Verify the selected source revision and a clean source tree.
-2. Record source identity, file inventory, license, and checksum evidence in `NOTICE.md` and the baseline record.
+2. Record source identity, file inventory, license, and checksum evidence in the external development reference.
 3. Reproduce the inherited test harness only in an expendable clone. Existing evidence shows fixture cleanup can remove its checkout.
 4. Build a complete source-artifact and test-disposition inventory before treating imported code as Foreman behavior.
-5. Transfer the selected source tree without `.git` history, preserving required license material.
-6. Treat the imported tree as quarantined provenance until it has passed Foreman's boundary scans, terminology removal, configuration replacement, and adapted tests.
+5. Port or rewrite only the selected behavior into Foreman-owned source, preserving required license material.
+6. Validate the resulting Foreman-owned code against boundary scans, terminology removal, configuration replacement, and adapted tests.
 7. Do not read source configuration, source operational state, or source project storage as Foreman input.
 
 ## 8. Test migration policy

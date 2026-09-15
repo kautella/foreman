@@ -6,6 +6,26 @@ It turns approved execution plans into bounded tasks, isolates concurrent work, 
 
 > **Status: early development.** Foreman is not yet usable for production orchestration.
 
+## Two ways to use the repository
+
+Foreman supports the same product surface from two entry paths:
+
+- Clone the repository, open it with Codex, and work from the checkout. Repository instructions tell Codex to generate the local `./foreman` launcher when it is needed.
+- Generate the launcher yourself and call it from this checkout or through an optional link in your preferred executable directory.
+
+```sh
+./scripts/install.sh
+./foreman --help
+```
+
+To make the command available elsewhere, choose an absolute executable directory:
+
+```sh
+./scripts/install.sh --link /absolute/path/to/bin
+```
+
+The root `foreman` file is generated and ignored by Git. It always delegates to the tracked implementation under `src/`, so both entry paths run the same code.
+
 ## Why Foreman
 
 Coordinating coding agents across several tasks requires reliable worktree isolation, worker supervision, recovery, validation, delivery controls, and durable state.
@@ -40,6 +60,8 @@ A capability is not considered supported until it has implementation and verific
 
 ## Project documentation
 
+To try the currently implemented initialization and plan-review surface, see [Getting started](docs/getting-started.md).
+
 The canonical project documentation lives in [`brain/`](brain/README.md):
 
 - [Vision](brain/vision.md)
@@ -54,7 +76,7 @@ The canonical project documentation lives in [`brain/`](brain/README.md):
 
 Foreman is an independent project. Its initial design and selected implementation work draw on FirstMate as a reference for orchestration behavior, safety properties, and operational lessons.
 
-Foreman is not a fork and does not provide FirstMate compatibility. Exact source provenance, attribution, and ongoing upstream-intake policy are documented in [`brain/upstream-map.md`](brain/upstream-map.md). Required license attribution will be recorded in `NOTICE.md` before any source import.
+Foreman is not a fork and does not provide FirstMate compatibility. Its source relationship and ongoing upstream-intake policy are documented in [`brain/upstream-map.md`](brain/upstream-map.md).
 
 ## License
 

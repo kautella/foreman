@@ -1,0 +1,11 @@
+{
+  "contract_version": 1,
+  "kind": "remote",
+  "id": "gitlab",
+  "display_name": "GitLab",
+  "executable": "glab",
+  "status": "contract-only",
+  "operations": ["detect", "diagnose", "create-change-request", "observe-change-request", "observe-checks", "merge", "observe-landing"],
+  "capabilities": {"draft_handoff": true, "automated_change_request": true, "merge": true},
+  "profile": null
+}

@@ -1,0 +1,19 @@
+{
+  "contract_version": 1,
+  "request_id": "request-01",
+  "adapter": {
+    "kind": "runtime",
+    "id": "tmux"
+  },
+  "operation": "diagnose",
+  "ok": false,
+  "status": "unavailable",
+  "data": {},
+  "diagnostics": [
+    {
+      "code": "executable-not-found",
+      "message": "The configured runtime executable was not found.",
+      "retryable": true
+    }
+  ]
+}

@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foreman.local/contracts/plan/plan.schema.json",
+  "title": "Foreman canonical execution plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plan_id",
+    "slug",
+    "project_slug",
+    "source",
+    "title",
+    "objective",
+    "scope",
+    "constraints",
+    "tasks",
+    "acceptance_criteria",
+    "assumptions",
+    "risks",
+    "missing_information",
+    "unresolved_decisions",
+    "references",
+    "status",
+    "approval"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "plan_id": {"type": "string", "pattern": "^plan-[0-9a-f]{12}$"},
+    "slug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "project_slug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "system", "reference"],
+      "properties": {
+        "kind": {"enum": ["direct", "external-handover", "guided-draft"]},
+        "system": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "minLength": 1}
+          ]
+        },
+        "reference": {
+          "oneOf": [
+            {"type": "null"},
+            {"type": "string", "minLength": 1}
+          ]
+        }
+      }
+    },
+    "title": {"type": "string", "minLength": 1},
+    "objective": {"type": "string", "minLength": 1},
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["included", "excluded"],
+      "properties": {
+        "included": {"$ref": "#/$defs/stringList"},
+        "excluded": {"$ref": "#/$defs/stringList"}
+      }
+    },
+    "constraints": {"$ref": "#/$defs/stringList"},
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/task"}
+    },
+    "acceptance_criteria": {"$ref": "#/$defs/nonemptyStringList"},
+    "assumptions": {"$ref": "#/$defs/stringList"},
+    "risks": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/risk"}
+    },
+    "missing_information": {"$ref": "#/$defs/stringList"},
+    "unresolved_decisions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/decision"}
+    },
+    "references": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/reference"}
+    },
+    "status": {"enum": ["proposed", "approved"]},
+    "approval": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["approved_at", "approved_by"],
+          "properties": {
+            "approved_at": {"type": "string", "minLength": 1},
+            "approved_by": {"type": "string", "minLength": 1}
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "stringList": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "nonemptyStringList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "workerProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent", "model", "reasoning"],
+      "properties": {
+        "agent": {"enum": ["claude", "codex", "gemini", "opencode", "pi"]},
+        "model": {"type": "string", "minLength": 1},
+        "reasoning": {"type": "string", "minLength": 1}
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "title",
+        "objective",
+        "depends_on",
+        "acceptance_criteria",
+        "validation",
+        "delivery_expectation",
+        "worker_profile_hint"
+      ],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+        "type": {"enum": ["change", "research"]},
+        "title": {"type": "string", "minLength": 1},
+        "objective": {"type": "string", "minLength": 1},
+        "depends_on": {"$ref": "#/$defs/stringList"},
+        "acceptance_criteria": {"$ref": "#/$defs/nonemptyStringList"},
+        "validation": {"$ref": "#/$defs/stringList"},
+        "delivery_expectation": {
+          "enum": ["project-default", "draft-handoff", "automated-change-request"]
+        },
+        "worker_profile_hint": {
+          "oneOf": [
+            {"type": "null"},
+            {"$ref": "#/$defs/workerProfile"}
+          ]
+        }
+      }
+    },
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "mitigation"],
+      "properties": {
+        "description": {"type": "string", "minLength": 1},
+        "mitigation": {"type": "string", "minLength": 1}
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "question", "blocking"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"},
+        "question": {"type": "string", "minLength": 1},
+        "blocking": {"type": "boolean"}
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "uri"],
+      "properties": {
+        "label": {"type": "string", "minLength": 1},
+        "uri": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"source": {"properties": {"kind": {"const": "external-handover"}}}}},
+      "then": {
+        "properties": {
+          "source": {
+            "properties": {
+              "system": {"type": "string", "minLength": 1},
+              "reference": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "source": {
+            "properties": {
+              "system": {"type": "null"},
+              "reference": {"type": "null"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "approved"}}},
+      "then": {"properties": {"approval": {"type": "object"}}},
+      "else": {"properties": {"approval": {"type": "null"}}}
+    }
+  ]
+}

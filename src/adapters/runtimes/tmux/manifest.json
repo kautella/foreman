@@ -1,0 +1,11 @@
+{
+  "contract_version": 1,
+  "kind": "runtime",
+  "id": "tmux",
+  "display_name": "tmux",
+  "executable": "tmux",
+  "status": "contract-only",
+  "operations": ["diagnose", "create", "inspect", "send", "capture", "wait", "close", "enumerate"],
+  "capabilities": {"events": false, "bounded_polling": true, "literal_input": true},
+  "profile": null
+}
