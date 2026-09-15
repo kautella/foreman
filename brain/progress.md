@@ -33,7 +33,7 @@ Foreman has a tested foundation for project registration and reviewed plan intak
 - Added a human plan template, strict direct-plan and handover schemas, examples, normalization rules, diagnostics, and unresolved-decision handling.
 - Implemented direct-plan intake, external handover, and guided drafting as three inputs to the same canonical plan contract.
 - Added deterministic plan IDs and duplicate protection.
-- Stored canonical plan JSON and rendered a standalone semantic `plan-{slug}.html` file with embedded CSS and escaped input.
+- Stored canonical plan JSON and rendered a standalone semantic `plan-{slug}.html` file with embedded CSS, an always-dark presentation, and escaped input.
 - Prevented plan input from increasing project delivery or merge authority.
 - Blocked invalid dependencies, dependency cycles, missing information, unresolved blocking decisions, and incomplete plans.
 - Required explicit approval of the exact stored plan and recorded approval without creating tasks or starting work.
@@ -60,7 +60,7 @@ Foreman has a tested foundation for project registration and reviewed plan intak
 - Classified the failures into harness limitations, a missing prerequisite gate, relevant source safety defects, and defects in features excluded from Foreman. These are source evidence only, not Foreman failures.
 - Completed the first ongoing upstream discovery review over 201 commits after the pin through `b182d0f908b78d08c7ccb8dce3775bdca8c5d657`.
 - Routed useful compatibility, locking, teardown, delivery-truth, recovery, worker-profile, and testing lessons to future Foreman phases. No upstream change was imported automatically.
-- Produced standalone external HTML reports for the source baseline, upstream intake, and Phase 1 readiness review.
+- Produced standalone external HTML reports for the source baseline, upstream intake, and Phase 1 readiness review; all Foreman plan and research reports now use an always-dark embedded presentation that does not vary with the viewer's system theme.
 
 ## Phase 1 verification
 

@@ -77,7 +77,7 @@ Local landing always remains user-controlled.
 A research task produces a durable, standalone `report-{slug}.html` document within the owning project's Foreman-managed task state under `projects/<project-name>/`.
 It does not write the report into the target repository unless the user explicitly directs that delivery.
 
-The report uses semantic HTML and embedded CSS only.
+The report uses semantic HTML and embedded CSS only. Its presentation is always dark and does not vary with the viewer's system theme.
 It has no external stylesheets, scripts, services, or session dependency, so it remains readable after the task and its runtime end.
 
 The report records:
@@ -133,7 +133,7 @@ Task metadata records the report's canonical path.
 - Guided drafting may inspect registered project context read-only and ask focused questions. It must not create worktrees, launch workers, mutate a repository or remote, or execute work before explicit plan approval.
 - All accepted input is normalized into a versioned execution-plan JSON document that records scope, tasks and dependencies, constraints, acceptance criteria, delivery expectations, worker-profile hints, references, and unresolved decisions.
 - A plan's origin, including an external agent handover, is provenance only. It cannot grant delivery, merge, discard, or other authority beyond the registered project policy.
-- Foreman renders each proposed plan as a durable standalone `plan-{slug}.html` artifact using semantic HTML and embedded CSS. The review presents the proposed scope, tasks, dependencies, acceptance criteria, policy implications, risks, missing information, and unresolved decisions.
+- Foreman renders each proposed plan as a durable standalone `plan-{slug}.html` artifact using semantic HTML, embedded CSS, and an always-dark presentation that does not vary with the viewer's system theme. The review presents the proposed scope, tasks, dependencies, acceptance criteria, policy implications, risks, missing information, and unresolved decisions.
 - Explicit user approval of the reviewed plan is required before Foreman initializes its tasks.
 
 ### Task lifecycle

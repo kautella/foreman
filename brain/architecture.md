@@ -177,7 +177,7 @@ All intake paths converge on a canonical execution plan. At minimum it records:
 
 The source of a plan is provenance, not authority. An external handover cannot enable delivery, merge, discard, or any other action excluded by the registered project policy.
 
-Foreman renders every proposed plan as `plan-{slug}.html`, a standalone semantic HTML document with embedded CSS. It makes scope, dependencies, acceptance criteria, policy implications, risks, missing information, and unresolved decisions reviewable before execution. Explicit user approval promotes the plan into task initialization.
+Foreman renders every proposed plan as `plan-{slug}.html`, a standalone semantic HTML document with embedded CSS and an always-dark presentation. It makes scope, dependencies, acceptance criteria, policy implications, risks, missing information, and unresolved decisions reviewable before execution. Explicit user approval promotes the plan into task initialization.
 
 Plan-level `completion.json` provides a stable machine-readable aggregate result for an upstream coordinator or automation. Each task retains its own `result.json`; human-readable handoffs and research reports remain linked artifacts rather than a substitute for structured results.
 
@@ -302,7 +302,7 @@ Supervision uses runtime-native events when the selected runtime and agent provi
 
 Append-only events are wake signals and audit evidence, not current-state truth. Current state is always reconciled from durable task metadata, Git, runtime inspection, adapter semantics, and remote state.
 
-Research reports are standalone semantic HTML with embedded CSS. They remain readable without a live session, third-party service, or external stylesheet. Their owning task records the report's canonical path and collision-safe slug.
+Research reports are standalone semantic HTML with embedded CSS and an always-dark presentation that does not vary with the viewer's system theme. They remain readable without a live session, third-party service, or external stylesheet. Their owning task records the report's canonical path and collision-safe slug.
 
 ## Repository layout
 

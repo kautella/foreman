@@ -53,6 +53,8 @@ A Foreman-managed project should be able to:
 
 10. **Upstream learning is continuous, not automatic.** Foreman reviews new FirstMate changes through a deliberate intake process. Useful changes are adopted as Foreman-owned work; incompatible ones are declined.
 
+11. **Reports are consistently readable.** Plan and research reports are durable, standalone HTML with embedded CSS and an always-dark presentation. They do not depend on a system theme, live session, or external styling service.
+
 ## Product boundaries
 
 Foreman does not:

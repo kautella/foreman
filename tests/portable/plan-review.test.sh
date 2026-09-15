@@ -54,6 +54,8 @@ test_direct_plan_creates_canonical_json_and_standalone_review() {
   ' "$plan_dir/plan.json" >/dev/null || test_fail 'canonical plan metadata is incorrect'
   test_assert_contains "$(sed -n '1,260p' "$review")" '<style>' \
     'review does not embed its styling'
+  test_assert_contains "$(sed -n '1,260p' "$review")" 'color-scheme: dark' \
+    'review does not force the Foreman dark presentation'
   test_assert_contains "$(sed -n '1,260p' "$review")" '&lt;script&gt;alert(1)&lt;/script&gt;' \
     'review did not escape plan content'
   if grep -Eq '<script|rel="stylesheet"' "$review"; then

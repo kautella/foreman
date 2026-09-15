@@ -55,7 +55,7 @@ Foreman may adapt selected source behavior from the pinned reference without imp
 | Project clones and Treehouse worktree handling | Registered target repositories, optional explicit acquisition, and direct Git worktrees | Replace | Isolated task worktrees without a Treehouse dependency or competing worktree owner. |
 | Briefs, backlog handoffs, task inboxes | Versioned execution plans, task briefs, task results | Redesign | Direct plans, external handovers, and guided drafting converge on approved plan JSON. |
 | Markdown backlog | Optional human-readable task projection | Redesign/defer | Canonical plan and task state remain validated JSON; a Markdown view cannot become the authoritative machine record. |
-| Plan and task reports | `plan-{slug}.html`, `report-{slug}.html` | Add/redesign | Standalone semantic HTML with embedded CSS, stored in Foreman-owned project state. |
+| Plan and task reports | `plan-{slug}.html`, `report-{slug}.html` | Add/redesign | Standalone semantic HTML with embedded CSS and an always-dark presentation, stored in Foreman-owned project state. |
 | Spawn, watch, state classification, locks, wake queues, teardown | Foreman core lifecycle and contracts | Retain/redesign | Exact task identity, durable events, recovery, fail-closed ambiguity, and safe cleanup. |
 | tmux backend | `src/adapters/runtimes/tmux/` | Retain/redesign | Full lifecycle control and exact endpoint safety. |
 | Herdr backend and helpers | `src/adapters/runtimes/herdr/` | Retain/redesign | Version-gated lifecycle, recovery, and stability evidence. |

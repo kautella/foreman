@@ -21,7 +21,7 @@ Phase 1 is complete on the feature branch. Foreman now provides:
 - strict versioned configuration, plan, handover, and adapter contracts;
 - reviewed, atomic project initialization with Git identity and path-safety checks;
 - direct-plan, external-handover, and guided-drafting intake that converges on canonical JSON;
-- deterministic plan identity, standalone HTML review, blocking-decision handling, and explicit approval;
+- deterministic plan identity, standalone always-dark HTML review, blocking-decision handling, and explicit approval;
 - contract-only definitions for the approved agent, runtime, and remote adapters;
 - active-code boundary scans, portable tests, syntax and data validation, contributor guidance, and a clean pre-commit entry point;
 - external source-baseline, upstream-intake, and Phase 1 readiness evidence.
