@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foreman.local/contracts/task/endpoint.schema.json",
+  "title": "Foreman task runtime endpoint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "endpoint_id", "runtime", "kind", "state", "reserved_at", "owner", "location", "last_observed_at"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "task_id": {"type": "string", "pattern": "^task-[0-9a-f]{12}$"},
+    "endpoint_id": {"type": "string", "pattern": "^endpoint-[0-9a-f]{12}$"},
+    "runtime": {"enum": ["tmux", "herdr"]},
+    "kind": {"enum": ["tmux-session", "herdr-session"]},
+    "state": {"enum": ["reserved", "active", "exited", "missing", "unreachable", "unknown", "closed"]},
+    "reserved_at": {"$ref": "#/$defs/timestamp"},
+    "owner": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "marker_path"],
+      "properties": {"task_id": {"type": "string", "pattern": "^task-[0-9a-f]{12}$"}, "marker_path": {"$ref": "#/$defs/absolutePath"}}
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["session", "pane"],
+      "properties": {"session": {"type": "string", "minLength": 1}, "pane": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]}}
+    },
+    "last_observed_at": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/timestamp"}]}
+  },
+  "$defs": {
+    "absolutePath": {"type": "string", "pattern": "^/"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"}
+  },
+  "allOf": [
+    {"if": {"properties": {"runtime": {"const": "tmux"}}}, "then": {"properties": {"kind": {"const": "tmux-session"}}}},
+    {"if": {"properties": {"runtime": {"const": "herdr"}}}, "then": {"properties": {"kind": {"const": "herdr-session"}}}},
+    {"if": {"properties": {"state": {"enum": ["active", "exited", "missing", "unreachable", "unknown", "closed"]}}}, "then": {"properties": {"last_observed_at": {"type": "string"}}}}
+  ]
+}

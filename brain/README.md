@@ -12,7 +12,7 @@ Read these files in order when taking on substantial Foreman work:
 2. `prd.md`
 3. `architecture.md`
 4. `upstream-map.md`
-5. `phase-1-backlog.md`
+5. the active phase backlog named by `current-focus.md`
 6. `current-focus.md`
 7. `progress.md`
 
@@ -26,7 +26,8 @@ For a focused task, begin with `current-focus.md` and then read the files releva
 | `prd.md` | Approved product requirements, supported capabilities, delivery policy, and release acceptance. |
 | `architecture.md` | Approved system boundaries, state ownership, lifecycle, configuration, adapter, and verification design. |
 | `upstream-map.md` | FirstMate provenance, retained and removed outcomes, source-import rules, and ongoing upstream intake. |
-| `phase-1-backlog.md` | The approved implementation sequence, Phase 1 tasks, exit criteria, and later-phase roadmap. |
+| `phase-1-backlog.md` | The completed Phase 1 implementation sequence, exit criteria, and later-phase roadmap. |
+| `phase-2-backlog.md` | The approved local-only Codex CLI and tmux vertical-slice sequence and Phase 2 exit criteria. |
 | `current-focus.md` | What currently matters, the immediate sequence, constraints, and next milestone. |
 | `progress.md` | Validated repository reality, completed evidence, risks, blockers, and the next verified checkpoint. |
 
@@ -41,7 +42,7 @@ When documents appear to conflict, resolve them in this order:
 3. `vision.md` and `prd.md` for product intent and scope.
 4. `architecture.md` for approved technical boundaries.
 5. `upstream-map.md` for source and provenance decisions.
-6. `phase-1-backlog.md` and `current-focus.md` for sequencing.
+6. the active phase backlog and `current-focus.md` for sequencing.
 7. `progress.md` for validated implementation reality.
 
 `progress.md` records evidence. It does not redefine product intent, architecture, or policy.
@@ -59,7 +60,7 @@ Update the smallest relevant file when a durable fact changes:
 - Update `vision.md` or `prd.md` when product intent or scope changes.
 - Update `architecture.md` when an approved technical boundary changes.
 - Update `upstream-map.md` when source provenance or upstream-intake policy changes.
-- Update `phase-1-backlog.md` when the implementation plan changes.
+- Update the active phase backlog when the implementation plan changes.
 - Update `current-focus.md` when the active milestone changes.
 - Update `progress.md` only with validated implementation evidence.
 

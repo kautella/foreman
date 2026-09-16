@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "handoff_id": "handoff-0123456789ab",
+  "task_id": "task-0123456789ab",
+  "created_at": "2026-09-16T08:12:00Z",
+  "kind": "local-change",
+  "branch": "feat/task-0123456789ab",
+  "base_commit": "0123456789abcdef0123456789abcdef01234567",
+  "head_commit": "89abcdef0123456789abcdef0123456789abcdef",
+  "validation_records": ["/state/tasks/task-0123456789ab/validation/validation-0123456789ab.json"],
+  "risks": [],
+  "instructions": ["Review the task-owned branch and land it manually when appropriate."]
+}

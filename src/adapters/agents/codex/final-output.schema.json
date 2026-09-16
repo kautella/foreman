@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foreman.local/adapters/codex/final-output.schema.json",
+  "title": "Foreman Codex task final output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "summary", "changed_files", "risks"],
+  "properties": {
+    "status": {"enum": ["completed", "blocked", "failed"]},
+    "summary": {"type": "string", "minLength": 1},
+    "changed_files": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "risks": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "validation_id": "validation-0123456789ab",
+  "task_id": "task-0123456789ab",
+  "sequence": 1,
+  "command": "./scripts/check.sh",
+  "working_directory": "/worktrees/sample-project/task-0123456789ab",
+  "started_at": "2026-09-16T08:10:00Z",
+  "finished_at": "2026-09-16T08:11:00Z",
+  "exit_status": 0,
+  "outcome": "passed",
+  "output": {"path": "/state/tasks/task-0123456789ab/validation/validation-0123456789ab.log", "sha256": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789", "bytes": 12},
+  "evidence": ["/state/tasks/task-0123456789ab/validation/validation-0123456789ab.log"]
+}

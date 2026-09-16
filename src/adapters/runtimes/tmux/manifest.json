@@ -4,7 +4,7 @@
   "id": "tmux",
   "display_name": "tmux",
   "executable": "tmux",
-  "status": "contract-only",
+  "status": "implemented-unverified",
   "operations": ["diagnose", "create", "inspect", "send", "capture", "wait", "close", "enumerate"],
   "capabilities": {"events": false, "bounded_polling": true, "literal_input": true},
   "profile": null

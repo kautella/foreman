@@ -2,9 +2,9 @@
 
 ## Status
 
-Phase 1 is complete on `feat/phase-1` and is awaiting maintainer review.
+Phase 1 merged to `main` through pull request #1 as `65cbfb1`. Phase 2 is approved and active on `feat/phase-2`.
 
-Foreman has a tested foundation for project registration and reviewed plan intake. It intentionally cannot create task worktrees, launch or supervise workers, execute plans, deliver changes, merge, or tear down task environments yet.
+Foreman has a tested foundation for project registration and reviewed plan intake. It intentionally cannot create task worktrees, launch or supervise workers, execute plans, deliver changes, merge, or tear down task environments yet. P2-000 through P2-005 are complete; P2-006 is the active implementation task. No execution capability is represented as supported yet.
 
 ## Completed product foundation
 
@@ -81,6 +81,21 @@ All F1-001 through F1-014 acceptance areas have evidence:
 
 No unresolved Phase 1 blocker remains.
 
+## Phase 2 evidence
+
+- P2-000 completed on 16 September 2026. `~/.foreman/projects/foreman/reports/report-upstream-intake-2026-09-16.html` is a standalone, always-dark HTML report covering all 22 upstream commits from `b182d0f..9ad5fc4`.
+- The intake adopted two Foreman-native requirements: persist task identity before a worker starts, and preserve an interrupted or paused validation outcome as non-completion. It deferred 12 changes to later phases, declined 6 as outside Foreman's approved boundary, and recorded 2 as informational. No external source code, tests, instructions, or configuration was imported.
+- P2-001 completed on 16 September 2026. Added strict versioned JSON contracts and examples for task metadata, configuration snapshots, runtime endpoints, append-only events, validation records, results, local handoffs, and research findings under `src/contracts/task/`.
+- `src/tasks/validate.sh` rejects malformed, incomplete, or authority-incompatible task records and enforces the normal lifecycle plus distinct `blocked`, `failed`, `missing`, `unreachable`, and `unknown` conditions. The new portable task-contract suite verifies normal and refused transitions, identity and reservation requirements, local-only handoffs, research results, and non-success validation outcomes. `./scripts/check.sh` passed with nine portable test files.
+- P2-002 completed on 16 September 2026. `src/state/lock.sh` creates project and task lock directories through atomic `mkdir`, persists strict owner records, requires the exact acquiring process to release, and refuses automatic recovery for existing, stale, remote, malformed, or otherwise ambiguous locks.
+- `src/state/events.sh` creates private event logs without following symbolic links and appends only validated, task-owned, bounded JSONL records with contiguous sequence numbers and unique event identities. `src/state/atomic.sh` now also rejects symbolic-link sources. The state-safety suite covers all of those refusal and preservation paths; the full suite passed on the host's stock macOS Bash 3.2 with ten portable test files.
+- P2-003 completed on 16 September 2026. `src/tasks/worktree.sh` allocates a task-owned change branch or detached research worktree only from an exact full base commit under a project lock. It preserves ambiguous partial work rather than removing it and writes its ownership marker outside the managed repository and worktree.
+- The worktree-safety suite proves clean change and research setup, exact branch and base binding, external marker validation, and refusal of dirty repositories, existing branches or targets, nested worktree roots, and markers inside a worktree root. The full suite passed with eleven portable test files.
+- P2-004 completed on 16 September 2026. The Codex manifest is `implemented-unverified`; `src/adapters/agents/codex/adapter.sh` owns executable and authentication diagnosis, exact model and reasoning launch-spec resolution, task-type sandbox selection, and bounded JSONL plus structured-final-output collection.
+- The portable adapter suite uses a Codex test double to prove authenticated and unauthenticated diagnostics, tamper and overwrite refusal, change `workspace-write` versus research `read-only` launch specs, and durable ambiguity when a completed terminal event or structured final output is missing. The full suite passed with twelve portable test files. A non-mutating local probe found the installed Codex CLI not authenticated, so no live task evidence exists.
+- P2-005 completed on 16 September 2026. The tmux manifest is `implemented-unverified`; `src/adapters/runtimes/tmux/adapter.sh` owns exact endpoint reservations, generated owned runners, launch only from a validated Codex specification, liveness inspection, 64 KiB capture, and closure only after endpoint and owner-marker proof.
+- The portable tmux suite uses a disposable runtime double to prove normalized diagnosis, reservation, launch, active inspection, bounded capture, closure, and refusal to adopt a pre-existing session. JSONL and stderr are separate launch artifacts. The full suite passed with thirteen portable test files. tmux remains unavailable on this host, so no live runtime evidence exists.
+
 ## Confirmed risks carried forward
 
 - Worktree creation, execution, supervision, delivery, recovery, and teardown are inherently higher-risk and require new Phase 2 evidence before use.
@@ -91,4 +106,4 @@ No unresolved Phase 1 blocker remains.
 
 ## Next verified checkpoint
 
-Complete maintainer review of the Phase 1 branch and reports. Then draft and approve the Phase 2 backlog for the local-only Codex CLI and tmux vertical slice before implementing task execution.
+Complete P2-006's task-launch and reconciliation evidence. Do not represent Codex CLI or tmux as supported until their implementation and opt-in live verification evidence exist.

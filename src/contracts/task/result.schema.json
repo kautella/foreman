@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foreman.local/contracts/task/result.schema.json",
+  "title": "Foreman task result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "result_id", "task_id", "created_at", "task_type", "lifecycle", "outcome", "summary", "git", "validation_records", "artifacts"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "result_id": {"type": "string", "pattern": "^result-[0-9a-f]{12}$"},
+    "task_id": {"type": "string", "pattern": "^task-[0-9a-f]{12}$"},
+    "created_at": {"$ref": "#/$defs/timestamp"},
+    "task_type": {"enum": ["change", "research"]},
+    "lifecycle": {"$ref": "#/$defs/lifecycle"},
+    "outcome": {"enum": ["handoff-ready", "change-request-ready", "landed", "report-ready", "blocked", "failed", "missing", "unreachable", "unknown"]},
+    "summary": {"type": "string", "minLength": 1},
+    "git": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/git"}]},
+    "validation_records": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^/"}},
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["handoff", "report", "findings"],
+      "properties": {
+        "handoff": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^/"}]},
+        "report": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^/"}]},
+        "findings": {"oneOf": [{"type": "null"}, {"type": "string", "pattern": "^/"}]}
+      }
+    }
+  },
+  "$defs": {
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "gitCommit": {"type": "string", "pattern": "^[0-9a-f]{40}(?:[0-9a-f]{24})?$"},
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "condition"],
+      "properties": {
+        "status": {"enum": ["awaiting-reconciliation", "validated", "delivery-ready", "change-request-ready", "report-ready", "landed"]},
+        "condition": {"oneOf": [{"type": "null"}, {"enum": ["blocked", "failed", "missing", "unreachable", "unknown"]}]}
+      }
+    },
+    "git": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base_commit", "head_commit", "branch"],
+      "properties": {
+        "base_commit": {"$ref": "#/$defs/gitCommit"},
+        "head_commit": {"$ref": "#/$defs/gitCommit"},
+        "branch": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"task_type": {"const": "change"}, "lifecycle": {"properties": {"condition": {"type": "null"}}}}}, "then": {"properties": {"outcome": {"enum": ["handoff-ready", "change-request-ready", "landed"]}, "git": {"type": "object"}, "artifacts": {"properties": {"report": {"type": "null"}}}}}},
+    {"if": {"properties": {"task_type": {"const": "research"}, "lifecycle": {"properties": {"condition": {"type": "null"}}}}}, "then": {"properties": {"outcome": {"const": "report-ready"}, "git": {"type": "null"}, "artifacts": {"properties": {"handoff": {"type": "null"}, "report": {"type": "string"}, "findings": {"type": "string"}}}}}}
+  ]
+}

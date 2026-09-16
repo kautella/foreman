@@ -44,7 +44,7 @@ foreman_adapter_validate_manifest() {
     ($id == "" or .id == $id) and
     (.display_name | nonempty) and
     (.executable | nonempty and test("^[a-zA-Z0-9._+-]+$")) and
-    .status == "contract-only" and
+    (.status | IN("contract-only", "implemented-unverified", "supported")) and
     (.operations | type == "array" and length > 0) and
     (all(.operations[]; slug)) and
     ((.operations | unique | length) == (.operations | length)) and

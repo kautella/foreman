@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "task_id": "task-0123456789ab",
+  "project_slug": "sample-project",
+  "plan": {"plan_id": "plan-0123456789ab", "task_id": "implement-safety"},
+  "task": {
+    "type": "change",
+    "title": "Implement safety",
+    "objective": "Add one bounded safety improvement.",
+    "acceptance_criteria": ["The change has a portable test."],
+    "validation_commands": ["./scripts/check.sh"]
+  },
+  "identity": {
+    "repository_path": "/work/sample-project",
+    "git_common_dir": "/work/sample-project/.git",
+    "base_commit": "0123456789abcdef0123456789abcdef01234567",
+    "worker_profile": {"agent": "codex", "model": "gpt-5.6-terra", "reasoning": "medium"},
+    "runtime": "tmux",
+    "delivery": {"policy": "draft-handoff", "merge_authority": false}
+  },
+  "configuration_snapshot": {"path": "/state/tasks/task-0123456789ab/configuration.json", "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"},
+  "worktree": {
+    "path": "/worktrees/sample-project/task-0123456789ab",
+    "git_dir": "/work/sample-project/.git/worktrees/task-0123456789ab",
+    "branch": "feat/task-0123456789ab",
+    "base_commit": "0123456789abcdef0123456789abcdef01234567",
+    "ownership_marker": "/worktrees/sample-project/task-0123456789ab/.foreman-task.json"
+  },
+  "runtime_endpoint": {"path": "/state/tasks/task-0123456789ab/endpoint.json", "sha256": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"},
+  "lifecycle": {"status": "prepared", "condition": null, "updated_at": "2026-09-16T08:00:00Z", "sequence": 2},
+  "artifacts": {
+    "brief": "/state/tasks/task-0123456789ab/brief.md",
+    "events": "/state/tasks/task-0123456789ab/events.jsonl",
+    "validation_directory": "/state/tasks/task-0123456789ab/validation",
+    "result": null,
+    "handoff": null,
+    "report": null,
+    "findings": null
+  }
+}

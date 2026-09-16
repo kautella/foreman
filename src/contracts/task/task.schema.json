@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foreman.local/contracts/task/task.schema.json",
+  "title": "Foreman durable task metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "project_slug", "plan", "task", "identity", "configuration_snapshot", "worktree", "runtime_endpoint", "lifecycle", "artifacts"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "task_id": {"type": "string", "pattern": "^task-[0-9a-f]{12}$"},
+    "project_slug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plan_id", "task_id"],
+      "properties": {
+        "plan_id": {"type": "string", "pattern": "^plan-[0-9a-f]{12}$"},
+        "task_id": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"}
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "title", "objective", "acceptance_criteria", "validation_commands"],
+      "properties": {
+        "type": {"enum": ["change", "research"]},
+        "title": {"type": "string", "minLength": 1},
+        "objective": {"type": "string", "minLength": 1},
+        "acceptance_criteria": {"$ref": "#/$defs/nonemptyStringList"},
+        "validation_commands": {"$ref": "#/$defs/stringList"}
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_path", "git_common_dir", "base_commit", "worker_profile", "runtime", "delivery"],
+      "properties": {
+        "repository_path": {"$ref": "#/$defs/absolutePath"},
+        "git_common_dir": {"$ref": "#/$defs/absolutePath"},
+        "base_commit": {"$ref": "#/$defs/gitCommit"},
+        "worker_profile": {"$ref": "#/$defs/workerProfile"},
+        "runtime": {"enum": ["tmux", "herdr"]},
+        "delivery": {"$ref": "#/$defs/delivery"}
+      }
+    },
+    "configuration_snapshot": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/documentReference"}]},
+    "worktree": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/worktree"}]},
+    "runtime_endpoint": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/documentReference"}]},
+    "lifecycle": {"$ref": "#/$defs/lifecycle"},
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["brief", "events", "validation_directory", "result", "handoff", "report", "findings"],
+      "properties": {
+        "brief": {"$ref": "#/$defs/nullablePath"},
+        "events": {"$ref": "#/$defs/absolutePath"},
+        "validation_directory": {"$ref": "#/$defs/nullablePath"},
+        "result": {"$ref": "#/$defs/nullablePath"},
+        "handoff": {"$ref": "#/$defs/nullablePath"},
+        "report": {"$ref": "#/$defs/nullablePath"},
+        "findings": {"$ref": "#/$defs/nullablePath"}
+      }
+    }
+  },
+  "$defs": {
+    "absolutePath": {"type": "string", "pattern": "^/"},
+    "nullablePath": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/absolutePath"}]},
+    "gitCommit": {"type": "string", "pattern": "^[0-9a-f]{40}(?:[0-9a-f]{24})?$"},
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "stringList": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "nonemptyStringList": {"allOf": [{"$ref": "#/$defs/stringList"}, {"minItems": 1}]},
+    "workerProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent", "model", "reasoning"],
+      "properties": {
+        "agent": {"enum": ["claude", "codex", "gemini", "opencode", "pi"]},
+        "model": {"type": "string", "minLength": 1},
+        "reasoning": {"type": "string", "minLength": 1}
+      }
+    },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy", "merge_authority"],
+      "properties": {
+        "policy": {"enum": ["draft-handoff", "automated-change-request"]},
+        "merge_authority": {"type": "boolean"}
+      }
+    },
+    "documentReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {"path": {"$ref": "#/$defs/absolutePath"}, "sha256": {"$ref": "#/$defs/sha256"}}
+    },
+    "worktree": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "git_dir", "branch", "base_commit", "ownership_marker"],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolutePath"},
+        "git_dir": {"$ref": "#/$defs/absolutePath"},
+        "branch": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]},
+        "base_commit": {"$ref": "#/$defs/gitCommit"},
+        "ownership_marker": {"$ref": "#/$defs/absolutePath"}
+      }
+    },
+    "lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "condition", "updated_at", "sequence"],
+      "properties": {
+        "status": {"enum": ["planned", "approved", "prepared", "running", "awaiting-reconciliation", "validated", "delivery-ready", "change-request-ready", "report-ready", "landed", "teardown-ready", "closed"]},
+        "condition": {"oneOf": [{"type": "null"}, {"enum": ["blocked", "failed", "missing", "unreachable", "unknown"]}]},
+        "updated_at": {"$ref": "#/$defs/timestamp"},
+        "sequence": {"type": "integer", "minimum": 0}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"task": {"properties": {"type": {"const": "change"}}}}},
+      "then": {"properties": {"worktree": {"oneOf": [{"type": "null"}, {"properties": {"branch": {"type": "string", "minLength": 1}}}]}}},
+      "else": {"properties": {"worktree": {"oneOf": [{"type": "null"}, {"properties": {"branch": {"type": "null"}}}]}}}
+    },
+    {
+      "if": {"properties": {"lifecycle": {"properties": {"status": {"enum": ["prepared", "running", "awaiting-reconciliation", "validated", "delivery-ready", "change-request-ready", "report-ready", "landed", "teardown-ready", "closed"]}}}}},
+      "then": {"properties": {"configuration_snapshot": {"type": "object"}, "worktree": {"type": "object"}, "runtime_endpoint": {"type": "object"}, "artifacts": {"properties": {"brief": {"type": "string"}, "validation_directory": {"type": "string"}}}}}
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "task_id": "task-0123456789ab",
+  "captured_at": "2026-09-16T08:00:00Z",
+  "project": {
+    "slug": "sample-project",
+    "repository_path": "/work/sample-project",
+    "git_common_dir": "/work/sample-project/.git",
+    "worktree_root": "/worktrees/sample-project",
+    "base_commit": "0123456789abcdef0123456789abcdef01234567"
+  },
+  "worker_profile": {"agent": "codex", "model": "gpt-5.6-terra", "reasoning": "medium"},
+  "runtime": "tmux",
+  "delivery": {"policy": "draft-handoff", "merge_authority": false},
+  "validation": {"commands": ["./scripts/check.sh"], "require_clean_worktree": true}
+}

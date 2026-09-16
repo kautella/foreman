@@ -3,8 +3,8 @@
 foreman_atomic_write() {
   local source=$1 destination=$2 directory temporary
 
-  [ -f "$source" ] || {
-    printf 'foreman: atomic write source is missing: %s\n' "$source" >&2
+  [ -f "$source" ] && [ ! -L "$source" ] || {
+    printf 'foreman: atomic write source is not a regular file: %s\n' "$source" >&2
     return 1
   }
   directory=${destination%/*}

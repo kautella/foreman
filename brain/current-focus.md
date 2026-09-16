@@ -2,7 +2,7 @@
 
 ## Current objective
 
-Review the completed Phase 1 foundation and its readiness evidence before defining Phase 2 implementation work.
+Execute the approved Phase 2 local-only Codex CLI and tmux vertical slice. P2-000 upstream intake through P2-005 tmux adapter implementation are complete; P2-006 task launch and reconciliation is the active task.
 
 ## Established state
 
@@ -13,8 +13,9 @@ The following approved documents remain the project contract:
 - `architecture.md`
 - `upstream-map.md`
 - `phase-1-backlog.md`
+- `phase-2-backlog.md`
 
-Phase 1 is complete on the feature branch. Foreman now provides:
+Phase 1 merged to `main` as `65cbfb1` through pull request #1. Foreman now provides:
 
 - a single tracked product tree under `src/`, a generated ignored root launcher, and a safe installer with an optional explicit executable-directory link;
 - a neutral command surface with `init`, `doctor`, and reviewed `plan` workflows;
@@ -26,29 +27,35 @@ Phase 1 is complete on the feature branch. Foreman now provides:
 - active-code boundary scans, portable tests, syntax and data validation, contributor guidance, and a clean pre-commit entry point;
 - external source-baseline, upstream-intake, and Phase 1 readiness evidence.
 
-The source reference remains pinned at `3f035336f9df7331e195bc6279cc1577e1cf4b49`. Its archive, license, inventory, contained tests, and known failures are recorded outside this repository. The first ongoing upstream discovery review covers 201 later commits through `b182d0f908b78d08c7ccb8dce3775bdca8c5d657` without automatically importing any change.
+The source reference remains pinned at `3f035336f9df7331e195bc6279cc1577e1cf4b49`. Its archive, license, inventory, contained tests, and known failures are recorded outside this repository. The first ongoing upstream discovery review covered 201 later commits through `b182d0f908b78d08c7ccb8dce3775bdca8c5d657` without automatically importing any change. P2-000 reviewed the next 22 commits through `9ad5fc4258c6c840958eabc15b41ad4bd3558739`, recorded every disposition in `~/.foreman/projects/foreman/reports/report-upstream-intake-2026-09-16.html`, and adopted only the identity-before-launch and durable-validation-state requirements.
 
-## Review boundary
+## Approved Phase 2 boundary
 
-The current branch is ready for maintainer review. Phase 2 has not started.
+Phase 2 is active on `feat/phase-2`. It implements one local-only vertical slice with Codex CLI and tmux only:
 
-The review should confirm:
-
-1. The initialization choices and rendered configuration match the intended user experience.
-2. The three plan-intake routes and explicit approval boundary are the correct gateway to future execution.
-3. The source-baseline failure classifications and upstream adoption candidates are reasonable.
-4. The Phase 1 implementation is ready to become the base for Phase 2 planning.
-5. The clone-and-operate and direct-executable access modes are clear, safe, and backed by the same implementation.
+- one active local-only task per project at a time;
+- change and research task flows with durable state and task-owned environments;
+- Codex CLI and tmux implementations behind their adapter boundaries;
+- validation evidence, local draft handoffs, recovery, and safe teardown;
+- portable fakes plus opt-in live evidence before either adapter is represented as supported.
 
 ## Constraints
 
-- Phase 1 does not create task worktrees, launch workers, execute approved plans, or mutate remotes.
-- Agent, runtime, and remote manifests remain `contract-only`; they do not claim provider support.
-- No provider executable may be invoked from the Foreman core.
-- No external source reference is active Foreman code, instructions, configuration, or test input.
-- Upstream changes remain subject to explicit intake, architecture review, Foreman-native implementation, and Foreman-owned evidence.
-- Ambiguous identity, ownership, liveness, delivery, or landing state must preserve work and block mutation.
+- GitHub, GitLab, Herdr, and all non-Codex agents remain deferred.
+- No remote tooling, push, change-request publication, merge, automatic local landing, or automatic teardown is in scope.
+- A change task may create local commits only on its exact task-owned branch; approval never authorizes rewriting unowned commits or landing work.
+- A research task uses a detached, exact-base worktree and a read-only worker sandbox. Unexpected edits fail the task and preserve the worktree.
+- The core must not invoke `codex` or `tmux` directly; the relevant adapter owns every provider call.
+- Ambiguous identity, ownership, liveness, validation, delivery, landing, or teardown state preserves work and blocks mutation.
+- tmux is not installed on the current host. Portable work may proceed, but live tmux evidence requires it to be available first.
 
-## Next milestone
+## Current sequence
 
-After maintainer review, define the Phase 2 backlog for the local-only Codex CLI and tmux vertical slice. Do not begin worker execution, worktree allocation, delivery, recovery, or teardown implementation before that plan is approved.
+1. P2-000 is complete: the full pre-Phase-2 upstream disposition is recorded as a dark external report.
+2. P2-001 is complete: strict durable task contracts and lifecycle transition checks have portable evidence.
+3. P2-002 is complete: exact-owner locks, atomic state writes, and append-only task events have portable evidence on stock macOS Bash 3.2.
+4. P2-003 is complete: isolated exact-base change and detached research worktrees have external ownership markers and portable Git-fixture evidence.
+5. P2-004 is complete: Codex diagnosis, profile-to-launch-spec resolution, and bounded structured-output collection have portable evidence.
+6. P2-005 is complete: tmux endpoint reservation, launch, inspection, bounded capture, and exact-owned closure have portable evidence.
+7. P2-006 launches and reconciles approved tasks.
+8. P2-007 through P2-010 complete validation, recovery, and Phase 2 verification evidence.

@@ -14,7 +14,7 @@ Commands:
   version    Print the Foreman version
   help       Show this help
 
-Worker execution is intentionally unavailable in Phase 1.
+Worker execution remains intentionally unavailable until its Phase 2 lifecycle is implemented and verified.
 EOF
 }
 

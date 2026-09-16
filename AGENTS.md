@@ -11,7 +11,9 @@ Before substantial work:
    - `brain/prd.md`
    - `brain/architecture.md`
    - `brain/upstream-map.md`
-   - `brain/phase-1-backlog.md`
+   - the active phase backlog named by `brain/current-focus.md`
+
+The active Phase 2 backlog is `brain/phase-2-backlog.md`. Read `brain/phase-1-backlog.md` when prior sequencing or Phase 1 evidence is relevant.
 
 The Project Brain is the authoritative Foreman-specific context. Preserve its established intent. Do not silently redefine product scope, architecture, authority, or safety policy through implementation.
 
