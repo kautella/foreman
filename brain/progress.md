@@ -4,7 +4,7 @@
 
 Phase 1 merged to `main` through pull request #1 as `65cbfb1`. Phase 2 is approved and active on `feat/phase-2`.
 
-Foreman has a tested foundation for project registration and reviewed plan intake. It intentionally cannot create task worktrees, launch or supervise workers, execute plans, deliver changes, merge, or tear down task environments yet. P2-000 through P2-005 are complete; P2-006 is the active implementation task. No execution capability is represented as supported yet.
+Foreman has a tested foundation for project registration, reviewed plan intake, and the Phase 2 task-start and reconciliation path. It intentionally cannot yet validate results, produce handoffs or research reports, recover all interrupted outcomes, deliver changes, merge, or tear down task environments. P2-000 through P2-006 are complete; P2-007 is the active implementation task. No execution capability is represented as supported yet.
 
 ## Completed product foundation
 
@@ -95,6 +95,8 @@ No unresolved Phase 1 blocker remains.
 - The portable adapter suite uses a Codex test double to prove authenticated and unauthenticated diagnostics, tamper and overwrite refusal, change `workspace-write` versus research `read-only` launch specs, and durable ambiguity when a completed terminal event or structured final output is missing. The full suite passed with twelve portable test files. A non-mutating local probe found the installed Codex CLI not authenticated, so no live task evidence exists.
 - P2-005 completed on 16 September 2026. The tmux manifest is `implemented-unverified`; `src/adapters/runtimes/tmux/adapter.sh` owns exact endpoint reservations, generated owned runners, launch only from a validated Codex specification, liveness inspection, 64 KiB capture, and closure only after endpoint and owner-marker proof.
 - The portable tmux suite uses a disposable runtime double to prove normalized diagnosis, reservation, launch, active inspection, bounded capture, closure, and refusal to adopt a pre-existing session. JSONL and stderr are separate launch artifacts. The full suite passed with thirteen portable test files. tmux remains unavailable on this host, so no live runtime evidence exists.
+- P2-006 completed on 16 September 2026. `foreman task start` now requires an approved local-only plan task, an explicit new change branch or branchless research task, an available authenticated Codex CLI and tmux runtime, and an idle managed project before any task state is created.
+- Start persists the immutable task identity, configuration snapshot, exact-base worktree marker, owned endpoint reservation, launch specification, task metadata, and append-only lifecycle events before creating the tmux session. `task status` remains read-only; `task reconcile` records missing or unreachable conditions without cleanup and resumes supervision only after exact endpoint liveness is proven. Task references must remain inside the exact task directory and retain their recorded SHA-256 identity. The portable task-command suite covers normal start, branch and approval refusal, unavailable adapters, read-only status, missing-endpoint preservation, proven recovery, and redirected-state refusal. The full suite passed with fourteen portable test files.
 
 ## Confirmed risks carried forward
 
@@ -106,4 +108,4 @@ No unresolved Phase 1 blocker remains.
 
 ## Next verified checkpoint
 
-Complete P2-006's task-launch and reconciliation evidence. Do not represent Codex CLI or tmux as supported until their implementation and opt-in live verification evidence exist.
+Complete P2-007's validation and local-handoff evidence. Do not represent Codex CLI or tmux as supported until their implementation and opt-in live verification evidence exist.
