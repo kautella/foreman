@@ -4,7 +4,7 @@
 
 Phase 1 merged to `main` through pull request #1 as `65cbfb1`. Phase 2 is approved and active on `feat/phase-2`.
 
-Foreman has a tested foundation for project registration, reviewed plan intake, and the Phase 2 task-start and reconciliation path. It intentionally cannot yet validate results, produce handoffs or research reports, recover all interrupted outcomes, deliver changes, merge, or tear down task environments. P2-000 through P2-006 are complete; P2-007 is the active implementation task. No execution capability is represented as supported yet.
+Foreman has a tested foundation for project registration, reviewed plan intake, task launch and reconciliation, and local terminal-result validation. It intentionally cannot yet recover all interrupted outcomes, deliver changes remotely, merge, or tear down task environments. P2-000 through P2-007 are complete; P2-008 is the active implementation task. No execution capability is represented as supported yet.
 
 ## Completed product foundation
 
@@ -97,6 +97,8 @@ No unresolved Phase 1 blocker remains.
 - The portable tmux suite uses a disposable runtime double to prove normalized diagnosis, reservation, launch, active inspection, bounded capture, closure, and refusal to adopt a pre-existing session. JSONL and stderr are separate launch artifacts. The full suite passed with thirteen portable test files. tmux remains unavailable on this host, so no live runtime evidence exists.
 - P2-006 completed on 16 September 2026. `foreman task start` now requires an approved local-only plan task, an explicit new change branch or branchless research task, an available authenticated Codex CLI and tmux runtime, and an idle managed project before any task state is created.
 - Start persists the immutable task identity, configuration snapshot, exact-base worktree marker, owned endpoint reservation, launch specification, task metadata, and append-only lifecycle events before creating the tmux session. `task status` remains read-only; `task reconcile` records missing or unreachable conditions without cleanup and resumes supervision only after exact endpoint liveness is proven. Task references must remain inside the exact task directory and retain their recorded SHA-256 identity. The portable task-command suite covers normal start, branch and approval refusal, unavailable adapters, read-only status, missing-endpoint preservation, proven recovery, and redirected-state refusal. The full suite passed with fourteen portable test files.
+- P2-007 completed on 16 September 2026. `foreman task validate` requires a non-active task endpoint and a bounded, structured Codex terminal result before it clears an earlier condition or progresses the lifecycle. It runs the registered and task-declared validation commands in the exact task worktree, preserving command, output, exit status, hash, and evidence as versioned records.
+- A successful change task must retain a clean task-owned branch with a commit beyond its exact base. Foreman produces a local handoff and result only; it does not push, publish, merge, land, discard, or tear down the worktree. A successful research task must remain clean and at its exact detached base; it receives a structured finding and a standalone report named `report-{slug}.html` with embedded always-dark CSS. Portable end-to-end fakes prove both flows, and the full suite continues to pass with fourteen portable test files.
 
 ## Confirmed risks carried forward
 
@@ -108,4 +110,4 @@ No unresolved Phase 1 blocker remains.
 
 ## Next verified checkpoint
 
-Complete P2-007's validation and local-handoff evidence. Do not represent Codex CLI or tmux as supported until their implementation and opt-in live verification evidence exist.
+Complete P2-008's recovery and teardown evidence. Do not represent Codex CLI or tmux as supported until their implementation and opt-in live verification evidence exist.

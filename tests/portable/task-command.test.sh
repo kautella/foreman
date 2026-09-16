@@ -72,6 +72,8 @@ printf 'fixture\n' >"$repository/README.md"
 git -C "$repository" add README.md
 git -C "$repository" -c user.name='Foreman Tests' -c user.email='tests@example.invalid' \
   commit -qm 'Create fixture'
+git -C "$repository" config user.name 'Foreman Tests'
+git -C "$repository" config user.email 'tests@example.invalid'
 
 FOREMAN_HOME="$home" "$foreman" init \
   --name 'Task Project' --project "$repository" --agent codex --model test-model \
@@ -89,7 +91,7 @@ task_id_from_output() {
 create_plan() {
   local title=$1 input output plan_id
   input="$test_root/$title.json"
-  jq --arg title "$title" '.title = $title' "$repo_root/src/contracts/plan/examples/direct-plan.json" >"$input"
+  jq --arg title "$title" '.title = $title | .tasks[0].validation = ["test -f RESULT.md"]' "$repo_root/src/contracts/plan/examples/direct-plan.json" >"$input"
   output=$(FOREMAN_HOME="$home" "$foreman" plan create --project task-project --file "$input") || return 1
   plan_id=$(plan_id_from_output "$output")
   [ -n "$plan_id" ] || return 1
@@ -192,6 +194,80 @@ test_reconcile_preserves_absence_and_recovers_proven_liveness() {
   test_pass 'reconcile preserves missing work and resumes only after proven endpoint liveness'
 }
 
+test_validate_prepares_a_local_change_handoff_after_terminal_evidence() {
+  local task_id task_file worktree session output handoff result
+  task_id=${FOREMAN_TEST_TASK_ID:-}
+  [ -n "$task_id" ] || test_fail 'prior task fixture did not expose a task identity'
+  task_file="$project_root/tasks/$task_id/task.json"
+  worktree=$(jq -r '.worktree.path' "$task_file")
+  session="foreman-task-${task_id#task-}"
+  printf 'completed change\n' >"$worktree/RESULT.md"
+  git -C "$worktree" add RESULT.md
+  git -C "$worktree" commit -qm 'Add result'
+  rm -f -- "$fake_tmux_state/$session"
+  printf '%s\n%s\n' '{"type":"thread.started"}' '{"type":"turn.completed"}' >"$project_root/tasks/$task_id/codex-events.jsonl"
+  printf '%s\n' '{"status":"completed","summary":"Implemented the requested local change.","changed_files":["RESULT.md"],"risks":[]}' >"$project_root/tasks/$task_id/codex-final.json"
+  output=$(FOREMAN_HOME="$home" "$foreman" task validate --project task-project --task "$task_id") \
+    || test_fail 'terminal completed task did not validate'
+  handoff=$(jq -r '.artifacts.handoff' "$task_file")
+  result=$(jq -r '.artifacts.result' "$task_file")
+  test_assert_contains "$output" 'Lifecycle: delivery-ready' 'validated change did not become delivery-ready'
+  foreman_task_validate_handoff "$handoff" || test_fail 'local handoff does not match its durable contract'
+  foreman_task_validate_result "$result" || test_fail 'change result does not match its durable contract'
+  jq -e --arg handoff "$handoff" --arg result "$result" '
+    .lifecycle.status == "delivery-ready" and .lifecycle.condition == null and
+    .artifacts.handoff == $handoff and .artifacts.result == $result
+  ' "$task_file" >/dev/null || test_fail 'task metadata does not reference the prepared local handoff'
+  [ "$(wc -l <"$project_root/tasks/$task_id/events.jsonl" | tr -d ' ')" = 9 ] || \
+    test_fail 'validation and handoff preparation did not preserve lifecycle history'
+  test_pass 'terminal change evidence runs validation and produces a local-only handoff'
+}
+
+test_validate_prepares_an_always_dark_research_report() {
+  local research_home research_repository input output plan_id task_id task_file session report findings result
+  research_home="$test_root/research-home"
+  research_repository="$test_root/research-repository"
+  mkdir -p "$research_repository"
+  git -C "$research_repository" init -q
+  printf 'research fixture\n' >"$research_repository/README.md"
+  git -C "$research_repository" add README.md
+  git -C "$research_repository" -c user.name='Foreman Tests' -c user.email='tests@example.invalid' \
+    commit -qm 'Create research fixture'
+  FOREMAN_HOME="$research_home" "$foreman" init \
+    --name 'Research Project' --project "$research_repository" --agent codex --model test-model \
+    --reasoning medium --runtime tmux --yes >/dev/null || test_fail 'research fixture initialization failed'
+  input="$test_root/research-plan.json"
+  jq '.title = "Research task" | .tasks[0].type = "research" | .tasks[0].validation = ["test -f README.md"]' \
+    "$repo_root/src/contracts/plan/examples/direct-plan.json" >"$input"
+  output=$(FOREMAN_HOME="$research_home" "$foreman" plan create --project research-project --file "$input") \
+    || test_fail 'could not create research plan'
+  plan_id=$(plan_id_from_output "$output")
+  FOREMAN_HOME="$research_home" "$foreman" plan approve --project research-project --plan "$plan_id" --yes >/dev/null \
+    || test_fail 'could not approve research plan'
+  output=$(FOREMAN_HOME="$research_home" "$foreman" task start --project research-project --plan "$plan_id" --task health-summary) \
+    || test_fail 'branchless research task did not start'
+  task_id=$(task_id_from_output "$output")
+  task_file="$research_home/projects/research-project/tasks/$task_id/task.json"
+  session="foreman-task-${task_id#task-}"
+  rm -f -- "$fake_tmux_state/$session"
+  printf '%s\n%s\n' '{"type":"thread.started"}' '{"type":"turn.completed"}' >"$research_home/projects/research-project/tasks/$task_id/codex-events.jsonl"
+  printf '%s\n' '{"status":"completed","summary":"The repository is healthy for the bounded research objective.","changed_files":[],"risks":[]}' >"$research_home/projects/research-project/tasks/$task_id/codex-final.json"
+  output=$(FOREMAN_HOME="$research_home" "$foreman" task validate --project research-project --task "$task_id") \
+    || test_fail 'terminal research task did not validate'
+  test_assert_contains "$output" 'Lifecycle: report-ready' 'validated research did not become report-ready'
+  report=$(jq -r '.artifacts.report' "$task_file")
+  findings=$(jq -r '.artifacts.findings' "$task_file")
+  result=$(jq -r '.artifacts.result' "$task_file")
+  [ -f "$report" ] && [ "${report##*/}" = report-health-summary.html ] || \
+    test_fail 'research report does not use the required report-slug filename'
+  grep -Fq 'color-scheme:dark' "$report" || test_fail 'research report does not force the dark presentation'
+  foreman_task_validate_research_finding "$findings" || test_fail 'research finding does not match its durable contract'
+  foreman_task_validate_result "$result" || test_fail 'research result does not match its durable contract'
+  [ -z "$(git -C "$research_repository" status --porcelain=v1 --untracked-files=all)" ] || \
+    test_fail 'research validation mutated the managed repository'
+  test_pass 'terminal research evidence produces a standalone always-dark report without repository mutation'
+}
+
 test_unavailable_preflight_creates_no_new_task_state() {
   local plan_id output status before after
   plan_id=$(create_plan 'Unavailable adapter') || test_fail 'could not create unavailable-adapter plan'
@@ -232,5 +308,7 @@ test_task_metadata_cannot_redirect_runtime_state() {
 test_start_requires_an_approved_plan_and_explicit_change_branch
 test_start_persists_identity_before_launch_and_status_is_read_only
 test_reconcile_preserves_absence_and_recovers_proven_liveness
+test_validate_prepares_a_local_change_handoff_after_terminal_evidence
+test_validate_prepares_an_always_dark_research_report
 test_unavailable_preflight_creates_no_new_task_state
 test_task_metadata_cannot_redirect_runtime_state

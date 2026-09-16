@@ -28,6 +28,8 @@ Commands:
                                    Show durable task and endpoint state
   reconcile --project SLUG --task TASK_ID
                                    Reconcile one task against its tmux endpoint
+  validate --project SLUG --task TASK_ID
+                                   Validate terminal work and prepare local output
 
 A change task requires an explicit, new branch name. A research task must not
 receive a branch. Task start never pushes, publishes, merges, lands, discards,
@@ -761,6 +763,9 @@ foreman_task_reconcile_command() {
   printf 'Endpoint state: %s\n' "$(jq -r '.state' "$endpoint")"
 }
 
+# shellcheck source=src/tasks/complete.sh
+. "$FOREMAN_SOURCE_ROOT/src/tasks/complete.sh"
+
 foreman_task_command() {
   local command=${1:-help}
 
@@ -768,7 +773,8 @@ foreman_task_command() {
     help|-h|--help) foreman_task_usage ;;
     start) shift; foreman_task_start_command "$@" ;;
     status) shift; foreman_task_status_command "$@" ;;
-    reconcile) shift; foreman_task_reconcile_command "$@" ;;
+  reconcile) shift; foreman_task_reconcile_command "$@" ;;
+  validate) shift; foreman_task_validate_command "$@" ;;
     *) foreman_task_command_error "unknown task command: $command"; foreman_task_usage >&2; return 64 ;;
   esac
 }
