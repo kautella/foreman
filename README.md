@@ -74,7 +74,7 @@ The canonical project documentation lives in [`brain/`](brain/README.md):
 
 ## Opt-in live verification
 
-Portable tests use disposable fakes and never consume coding-agent usage. The Phase 2 adapters remain `implemented-unverified` until their real-environment evidence exists.
+Portable tests use disposable fakes and never consume coding-agent usage. Phase 2's local Codex-and-tmux execution path has both portable and real-environment evidence. The adapter manifests remain `implemented-unverified`: broader declared operations such as resume and interrupt are not implemented or verified in this local-only vertical slice.
 
 When the host has tmux, exercise the real tmux adapter with a harmless fake worker and retain the resulting evidence in a new directory:
 

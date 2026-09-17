@@ -2,7 +2,7 @@
 
 ## Current objective
 
-Execute the approved Phase 2 local-only Codex CLI and tmux vertical slice. P2-000 upstream intake through P2-008 recovery and safe teardown are complete. P2-009's portable evidence, live harness, and live tmux evidence are complete; its real Codex task evidence remains active pending explicit usage approval.
+Phase 2 is complete on `feat/phase-2`. Its local-only Codex CLI and tmux vertical slice now has portable evidence, real tmux lifecycle evidence, and one real read-only Codex research-task result. P2-010's readiness report is the final Phase 2 artifact; no later implementation phase is active until it is reviewed.
 
 ## Established state
 
@@ -31,7 +31,7 @@ The source reference remains pinned at `3f035336f9df7331e195bc6279cc1577e1cf4b49
 
 ## Approved Phase 2 boundary
 
-Phase 2 is active on `feat/phase-2`. It implements one local-only vertical slice with Codex CLI and tmux only:
+Phase 2 was completed on `feat/phase-2`. It implemented one local-only vertical slice with Codex CLI and tmux only:
 
 - one active local-only task per project at a time;
 - change and research task flows with durable state and task-owned environments;
@@ -60,11 +60,13 @@ Phase 2 is active on `feat/phase-2`. It implements one local-only vertical slice
 7. P2-006 is complete: the public task command starts, observes, and reconciles one durably identified local task.
 8. P2-007 is complete: terminal worker evidence, declared validation, local handoffs, and dark research reports are durable.
 9. P2-008 is complete: reconciliation verifies task-owned Git identity and available worker evidence, while teardown requires either proven local landing or an explicit exact-task discard authority.
-10. P2-009 has added a portable live-harness contract and durable evidence layout. The real tmux lifecycle passed on 17 September 2026; one real Codex research task still needs current explicit usage approval.
-11. P2-010 publishes the Phase 2 readiness evidence after P2-009's live results are available.
+10. P2-009 is complete: the real tmux lifecycle passed on 17 September 2026, and one explicitly authorized real Codex research task completed through Foreman with durable result, validation, report, and teardown evidence.
+11. P2-010 is complete: the Phase 2 readiness report is `~/.foreman/projects/foreman/reports/report-phase-2-readiness.html`.
 
-## Current verification boundary
+## Verified Phase 2 evidence
 
-The host has tmux `3.7c` and Codex CLI `0.147.0`. The real tmux lifecycle passed with a harmless fake worker; its durable evidence is at `~/.foreman/projects/foreman/evidence/live-tmux-2026-09-17-retry-2/`. The harness now selects a unique short tmux server name through the adapter, avoiding macOS Unix-socket path limits while staying isolated from user sessions. The first real Codex preflight confirmed authentication, but Codex rejected the supplied structured-output schema before a worker result was produced because its `uniqueItems` constraint is unsupported. The revised schema leaves duplicate-value enforcement to Foreman's own validator.
+The host has tmux `3.7c` and Codex CLI `0.147.0`. The real tmux lifecycle passed with a harmless fake worker; its durable evidence is at `~/.foreman/projects/foreman/evidence/live-tmux-2026-09-17-retry-2/`. The harness selects a unique short tmux server name through the adapter, avoiding macOS Unix-socket path limits while staying isolated from user sessions.
 
-Do not run the real Codex mode until the maintainer explicitly authorizes that usage at the time of execution. Do not represent Codex CLI as supported until the live task passes and its evidence is reviewed.
+The second explicitly authorized Codex run authenticated successfully and completed a read-only research task with `gpt-5.6-terra` at `medium` reasoning. It retained structured worker output, passed validation, produced a dark report, left the disposable repository clean at its exact base, and closed only its exact task-owned worktree. Its evidence is at `~/.foreman/projects/foreman/evidence/live-codex-2026-09-17-retry-1/`.
+
+This verifies the Phase 2 vertical slice, not the full adapter manifests. Codex resume and interrupt, and tmux operations beyond the implemented lifecycle, remain deferred; both manifests stay `implemented-unverified` rather than overstating support.
