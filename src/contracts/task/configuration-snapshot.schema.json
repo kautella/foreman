@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foreman.local/contracts/task/configuration-snapshot.schema.json",
+  "title": "Foreman task configuration snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "captured_at", "project", "worker_profile", "runtime", "delivery", "validation"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "task_id": {"type": "string", "pattern": "^task-[0-9a-f]{12}$"},
+    "captured_at": {"$ref": "#/$defs/timestamp"},
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slug", "repository_path", "git_common_dir", "worktree_root", "base_commit"],
+      "properties": {
+        "slug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+        "repository_path": {"$ref": "#/$defs/absolutePath"},
+        "git_common_dir": {"$ref": "#/$defs/absolutePath"},
+        "worktree_root": {"$ref": "#/$defs/absolutePath"},
+        "base_commit": {"$ref": "#/$defs/gitCommit"}
+      }
+    },
+    "worker_profile": {"$ref": "#/$defs/workerProfile"},
+    "runtime": {"enum": ["tmux", "herdr"]},
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy", "merge_authority"],
+      "properties": {
+        "policy": {"enum": ["draft-handoff", "automated-change-request"]},
+        "merge_authority": {"type": "boolean"}
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commands", "require_clean_worktree"],
+      "properties": {
+        "commands": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "require_clean_worktree": {"type": "boolean"}
+      }
+    }
+  },
+  "$defs": {
+    "absolutePath": {"type": "string", "pattern": "^/"},
+    "gitCommit": {"type": "string", "pattern": "^[0-9a-f]{40}(?:[0-9a-f]{24})?$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"},
+    "workerProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent", "model", "reasoning"],
+      "properties": {
+        "agent": {"enum": ["claude", "codex", "gemini", "opencode", "pi"]},
+        "model": {"type": "string", "minLength": 1},
+        "reasoning": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"delivery": {"properties": {"policy": {"const": "draft-handoff"}}}}},
+      "then": {"properties": {"delivery": {"properties": {"merge_authority": {"const": false}}}}}
+    }
+  ]
+}

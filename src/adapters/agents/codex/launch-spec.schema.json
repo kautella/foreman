@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foreman.local/adapters/codex/launch-spec.schema.json",
+  "title": "Foreman Codex launch specification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "adapter", "request_id", "task_id", "task_type", "worktree_path", "profile", "sandbox", "command", "arguments", "stdin_path", "jsonl_path", "stderr_path", "final_output_path", "output_schema_path"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "adapter": {"const": "codex"},
+    "request_id": {"type": "string", "pattern": "^codex-request-[0-9a-f]{12}$"},
+    "task_id": {"type": "string", "pattern": "^task-[0-9a-f]{12}$"},
+    "task_type": {"enum": ["change", "research"]},
+    "worktree_path": {"type": "string", "pattern": "^/"},
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "reasoning"],
+      "properties": {"model": {"type": "string", "minLength": 1}, "reasoning": {"type": "string", "minLength": 1}}
+    },
+    "sandbox": {"enum": ["workspace-write", "read-only"]},
+    "command": {"const": "codex"},
+    "arguments": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "stdin_path": {"type": "string", "pattern": "^/"},
+    "jsonl_path": {"type": "string", "pattern": "^/"},
+    "stderr_path": {"type": "string", "pattern": "^/"},
+    "final_output_path": {"type": "string", "pattern": "^/"},
+    "output_schema_path": {"type": "string", "pattern": "^/"}
+  }
+}

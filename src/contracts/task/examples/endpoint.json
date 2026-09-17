@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "task_id": "task-0123456789ab",
+  "endpoint_id": "endpoint-0123456789ab",
+  "runtime": "tmux",
+  "kind": "tmux-session",
+  "state": "reserved",
+  "reserved_at": "2026-09-16T08:00:00Z",
+  "owner": {"task_id": "task-0123456789ab", "marker_path": "/state/tasks/task-0123456789ab/endpoint-owner.json"},
+  "location": {"session": "foreman-task-0123456789ab", "pane": null},
+  "last_observed_at": null
+}

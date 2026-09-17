@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foreman.local/adapters/codex/launch-request.schema.json",
+  "title": "Foreman Codex launch request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "request_id", "task_id", "task_type", "worktree_path", "profile", "prompt_path", "jsonl_path", "stderr_path", "final_output_path"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "request_id": {"type": "string", "pattern": "^codex-request-[0-9a-f]{12}$"},
+    "task_id": {"type": "string", "pattern": "^task-[0-9a-f]{12}$"},
+    "task_type": {"enum": ["change", "research"]},
+    "worktree_path": {"type": "string", "pattern": "^/"},
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model", "reasoning"],
+      "properties": {"model": {"type": "string", "minLength": 1}, "reasoning": {"type": "string", "minLength": 1}}
+    },
+    "prompt_path": {"type": "string", "pattern": "^/"},
+    "jsonl_path": {"type": "string", "pattern": "^/"},
+    "stderr_path": {"type": "string", "pattern": "^/"},
+    "final_output_path": {"type": "string", "pattern": "^/"}
+  }
+}

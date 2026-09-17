@@ -105,6 +105,7 @@ The home is distinct from both Foreman's source checkout and managed repositorie
           result.json
           validation/
           delivery/
+          teardown.json
           reports/
             report-{slug}.html
       worktrees/

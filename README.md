@@ -72,6 +72,26 @@ The canonical project documentation lives in [`brain/`](brain/README.md):
 - [Current focus](brain/current-focus.md)
 - [Progress](brain/progress.md)
 
+## Opt-in live verification
+
+Portable tests use disposable fakes and never consume coding-agent usage. Phase 2's local Codex-and-tmux execution path has both portable and real-environment evidence. The adapter manifests remain `implemented-unverified`: broader declared operations such as resume and interrupt are not implemented or verified in this local-only vertical slice.
+
+When the host has tmux, exercise the real tmux adapter with a harmless fake worker and retain the resulting evidence in a new directory:
+
+```sh
+./scripts/live-check.sh --tmux --evidence-dir /absolute/new/evidence-directory
+```
+
+One real, read-only Codex CLI task is separately gated because it consumes account usage. Supply the exact model and reasoning level and the explicit usage flag only when that run is intended:
+
+```sh
+./scripts/live-check.sh --codex-task --allow-codex-usage \
+  --model MODEL --reasoning REASONING \
+  --evidence-dir /absolute/new/evidence-directory
+```
+
+The script creates a disposable Git repository inside the evidence directory, preserves all evidence on success or failure, never contacts a remote, and tears down only its exact task-owned worktree after the research report is produced.
+
 ## Provenance
 
 Foreman is an independent project. Its initial design and selected implementation work draw on FirstMate as a reference for orchestration behavior, safety properties, and operational lessons.

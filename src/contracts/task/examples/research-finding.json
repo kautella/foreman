@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "finding_id": "finding-0123456789ab",
+  "task_id": "task-0123456789ab",
+  "created_at": "2026-09-16T08:12:00Z",
+  "title": "Validation command completed",
+  "summary": "The declared validation command passed in the isolated environment.",
+  "confidence": "high",
+  "evidence": [{"kind": "command-output", "reference": "/state/tasks/task-0123456789ab/validation/validation-0123456789ab.log", "description": "Recorded command output."}],
+  "report_path": "/state/tasks/task-0123456789ab/reports/report-validation.html"
+}

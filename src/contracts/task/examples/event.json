@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "event_id": "event-0123456789ab",
+  "task_id": "task-0123456789ab",
+  "sequence": 2,
+  "at": "2026-09-16T08:00:00Z",
+  "kind": "lifecycle-transition",
+  "actor": "foreman",
+  "from": {"status": "approved", "condition": null},
+  "to": {"status": "prepared", "condition": null},
+  "message": "Persisted the task environment reservation.",
+  "evidence": ["/state/tasks/task-0123456789ab/configuration.json", "/state/tasks/task-0123456789ab/endpoint.json"]
+}
