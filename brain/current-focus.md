@@ -2,7 +2,7 @@
 
 ## Current objective
 
-Execute the approved Phase 2 local-only Codex CLI and tmux vertical slice. P2-000 upstream intake through P2-008 recovery and safe teardown are complete; P2-009 verification evidence is the active task.
+Execute the approved Phase 2 local-only Codex CLI and tmux vertical slice. P2-000 upstream intake through P2-008 recovery and safe teardown are complete. P2-009's portable evidence and opt-in live harness are complete; its live adapter evidence remains active and blocked by host prerequisites.
 
 ## Established state
 
@@ -60,5 +60,11 @@ Phase 2 is active on `feat/phase-2`. It implements one local-only vertical slice
 7. P2-006 is complete: the public task command starts, observes, and reconciles one durably identified local task.
 8. P2-007 is complete: terminal worker evidence, declared validation, local handoffs, and dark research reports are durable.
 9. P2-008 is complete: reconciliation verifies task-owned Git identity and available worker evidence, while teardown requires either proven local landing or an explicit exact-task discard authority.
-10. P2-009 establishes portable and opt-in live adapter verification evidence.
-11. P2-010 publishes the Phase 2 readiness evidence.
+10. P2-009 has added a portable live-harness contract and durable evidence layout. It remains active until the real tmux lifecycle and one real Codex research task run with explicit usage approval.
+11. P2-010 publishes the Phase 2 readiness evidence after P2-009's live results are available.
+
+## Current verification boundary
+
+The host has Codex CLI `0.147.0`, but its adapter diagnosis reports `authentication-not-ready`; tmux is not installed. The new `scripts/live-check.sh` preserves evidence in a caller-selected directory, exercises the real tmux adapter with a harmless fake worker in `--tmux` mode, and runs one disposable read-only Codex research task only with `--codex-task --allow-codex-usage --model MODEL --reasoning VALUE`.
+
+Do not run the real Codex mode until the maintainer explicitly authorizes that usage at the time of execution. Do not represent either adapter as supported until both live checks pass and their evidence is reviewed.
