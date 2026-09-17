@@ -94,6 +94,27 @@ foreman_tmux_require_available() {
   printf '%s\n' "$executable"
 }
 
+foreman_tmux_invoke() {
+  local executable=$1 server_name
+  shift
+
+  server_name=${FOREMAN_TMUX_SERVER_NAME:-}
+  case "$server_name" in
+    '') "$executable" "$@" ;;
+    *[!A-Za-z0-9_-]*)
+      foreman_tmux_error 'tmux server name contains unsupported characters'
+      return 1
+      ;;
+    *)
+      [ "${#server_name}" -le 48 ] || {
+        foreman_tmux_error 'tmux server name exceeds 48 characters'
+        return 1
+      }
+      "$executable" -L "$server_name" "$@"
+      ;;
+  esac
+}
+
 foreman_tmux_diagnose() {
   local request_id=$1 destination=$2 executable version data
 
@@ -105,7 +126,7 @@ foreman_tmux_diagnose() {
       executable-not-found "tmux executable '$executable' was not found"
     return 1
   fi
-  version=$("$executable" -V 2>/dev/null) || version=unknown
+  version=$(foreman_tmux_invoke "$executable" -V 2>/dev/null) || version=unknown
   version=${version%%$'\n'*}
   version=${version:0:512}
   data=$(jq -n --arg executable "$executable" --arg version "$version" '{executable: $executable, version: $version}')
@@ -318,18 +339,18 @@ foreman_tmux_start() {
   }
   session=$(jq -r '.location.session' "$endpoint_file")
   executable=$(foreman_tmux_require_available) || return 1
-  if "$executable" has-session -t "$session" >/dev/null 2>&1; then
+  if foreman_tmux_invoke "$executable" has-session -t "$session" >/dev/null 2>&1; then
     foreman_tmux_error "tmux session already exists and will not be adopted: $session"
     return 1
   fi
   foreman_tmux_write_runner "$runner_file" "$spec_file" || return 1
   foreman_lock_assert_owned task "$task_lock" "$project_slug" "$task_id" "$lock_id" || return 1
-  "$executable" new-session -d -s "$session" -c "$spec_worktree" "$runner_file" "$spec_file" >/dev/null 2>&1 || {
+  foreman_tmux_invoke "$executable" new-session -d -s "$session" -c "$spec_worktree" "$runner_file" "$spec_file" >/dev/null || {
     foreman_tmux_error "tmux could not create task-owned session: $session"
     return 1
   }
   observed_at=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
-  if ! "$executable" has-session -t "$session" >/dev/null 2>&1; then
+  if ! foreman_tmux_invoke "$executable" has-session -t "$session" >/dev/null 2>&1; then
     foreman_tmux_update_endpoint "$endpoint_file" unknown "$observed_at" || return 1
     foreman_tmux_error "tmux launch did not yield a proven session; endpoint is unknown: $session"
     return 1
@@ -352,7 +373,7 @@ foreman_tmux_inspect() {
   session=$(jq -r '.location.session' "$endpoint_file")
   executable=$(foreman_tmux_require_available) || return 1
   observed_at=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
-  if "$executable" has-session -t "$session" >/dev/null 2>&1; then
+  if foreman_tmux_invoke "$executable" has-session -t "$session" >/dev/null 2>&1; then
     foreman_tmux_update_endpoint "$endpoint_file" active "$observed_at"
   else
     foreman_tmux_update_endpoint "$endpoint_file" missing "$observed_at"
@@ -374,13 +395,13 @@ foreman_tmux_capture() {
   }
   session=$(jq -r '.location.session' "$endpoint_file")
   executable=$(foreman_tmux_require_available) || return 1
-  "$executable" has-session -t "$session" >/dev/null 2>&1 || {
+  foreman_tmux_invoke "$executable" has-session -t "$session" >/dev/null 2>&1 || {
     foreman_tmux_error "cannot capture an absent task-owned session: $session"
     return 1
   }
   directory=${destination%/*}
   temporary=$(mktemp "$directory/.foreman-tmux-capture.XXXXXX") || return 1
-  "$executable" capture-pane -p -t "$session" -S -200 2>/dev/null | tail -c 65536 >"$temporary"
+  foreman_tmux_invoke "$executable" capture-pane -p -t "$session" -S -200 2>/dev/null | tail -c 65536 >"$temporary"
   pipeline_status=("${PIPESTATUS[@]}")
   capture_status=${pipeline_status[0]}
   tail_status=${pipeline_status[1]}
@@ -407,16 +428,16 @@ foreman_tmux_close() {
   session=$(jq -r '.location.session' "$endpoint_file")
   executable=$(foreman_tmux_require_available) || return 1
   observed_at=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
-  "$executable" has-session -t "$session" >/dev/null 2>&1 || {
+  foreman_tmux_invoke "$executable" has-session -t "$session" >/dev/null 2>&1 || {
     foreman_tmux_update_endpoint "$endpoint_file" missing "$observed_at" || return 1
     foreman_tmux_error "task-owned session is absent; endpoint remains preserved as missing: $session"
     return 1
   }
-  "$executable" kill-session -t "$session" >/dev/null 2>&1 || {
+  foreman_tmux_invoke "$executable" kill-session -t "$session" >/dev/null 2>&1 || {
     foreman_tmux_error "tmux could not close task-owned session: $session"
     return 1
   }
-  if "$executable" has-session -t "$session" >/dev/null 2>&1; then
+  if foreman_tmux_invoke "$executable" has-session -t "$session" >/dev/null 2>&1; then
     foreman_tmux_update_endpoint "$endpoint_file" unknown "$observed_at" || return 1
     foreman_tmux_error "tmux session remained after closure request; endpoint is unknown: $session"
     return 1

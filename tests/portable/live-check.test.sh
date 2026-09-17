@@ -18,6 +18,7 @@ printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -u' \
   'state=${FAKE_TMUX_STATE:?}' \
+  'if [ "${1:-}" = -L ]; then shift 2; fi' \
   'command=${1:-}' \
   'shift || true' \
   'case "$command" in' \

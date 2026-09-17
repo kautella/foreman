@@ -2,7 +2,7 @@
 
 ## Current objective
 
-Execute the approved Phase 2 local-only Codex CLI and tmux vertical slice. P2-000 upstream intake through P2-008 recovery and safe teardown are complete. P2-009's portable evidence and opt-in live harness are complete; its live adapter evidence remains active and blocked by host prerequisites.
+Execute the approved Phase 2 local-only Codex CLI and tmux vertical slice. P2-000 upstream intake through P2-008 recovery and safe teardown are complete. P2-009's portable evidence, live harness, and live tmux evidence are complete; its real Codex task evidence remains active pending explicit usage approval.
 
 ## Established state
 
@@ -47,7 +47,7 @@ Phase 2 is active on `feat/phase-2`. It implements one local-only vertical slice
 - A research task uses a detached, exact-base worktree and a read-only worker sandbox. Unexpected edits fail the task and preserve the worktree.
 - The core must not invoke `codex` or `tmux` directly; the relevant adapter owns every provider call.
 - Ambiguous identity, ownership, liveness, validation, delivery, landing, or teardown state preserves work and blocks mutation.
-- tmux is not installed on the current host. Portable work may proceed, but live tmux evidence requires it to be available first.
+- Live tmux evidence must use a unique adapter-owned tmux server so it cannot adopt or affect an existing user session.
 
 ## Current sequence
 
@@ -60,11 +60,11 @@ Phase 2 is active on `feat/phase-2`. It implements one local-only vertical slice
 7. P2-006 is complete: the public task command starts, observes, and reconciles one durably identified local task.
 8. P2-007 is complete: terminal worker evidence, declared validation, local handoffs, and dark research reports are durable.
 9. P2-008 is complete: reconciliation verifies task-owned Git identity and available worker evidence, while teardown requires either proven local landing or an explicit exact-task discard authority.
-10. P2-009 has added a portable live-harness contract and durable evidence layout. It remains active until the real tmux lifecycle and one real Codex research task run with explicit usage approval.
+10. P2-009 has added a portable live-harness contract and durable evidence layout. The real tmux lifecycle passed on 17 September 2026; one real Codex research task still needs current explicit usage approval.
 11. P2-010 publishes the Phase 2 readiness evidence after P2-009's live results are available.
 
 ## Current verification boundary
 
-The host has Codex CLI `0.147.0`, but its adapter diagnosis reports `authentication-not-ready`; tmux is not installed. The new `scripts/live-check.sh` preserves evidence in a caller-selected directory, exercises the real tmux adapter with a harmless fake worker in `--tmux` mode, and runs one disposable read-only Codex research task only with `--codex-task --allow-codex-usage --model MODEL --reasoning VALUE`.
+The host has tmux `3.7c` and Codex CLI `0.147.0`. The real tmux lifecycle passed with a harmless fake worker; its durable evidence is at `~/.foreman/projects/foreman/evidence/live-tmux-2026-09-17-retry-2/`. The harness now selects a unique short tmux server name through the adapter, avoiding macOS Unix-socket path limits while staying isolated from user sessions. The maintainer reports the Codex CLI is authenticated; the real task preflight will record that status before any worker begins.
 
-Do not run the real Codex mode until the maintainer explicitly authorizes that usage at the time of execution. Do not represent either adapter as supported until both live checks pass and their evidence is reviewed.
+Do not run the real Codex mode until the maintainer explicitly authorizes that usage at the time of execution. Do not represent Codex CLI as supported until the live task passes and its evidence is reviewed.

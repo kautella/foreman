@@ -117,21 +117,21 @@ live_write_launch_request() {
 }
 
 live_run_tmux() {
-  local evidence_dir=$1 state_dir worktree fake_bin socket_dir executable diagnosis request spec endpoint owner runner capture lock
+  local evidence_dir=$1 state_dir worktree fake_bin executable diagnosis request spec endpoint owner runner capture lock
 
   state_dir="$evidence_dir/tmux-state"
   worktree="$evidence_dir/tmux-worktree"
   fake_bin="$evidence_dir/fake-worker-bin"
-  socket_dir="$state_dir/socket"
-  mkdir -m 700 "$state_dir" "$worktree" "$socket_dir" || return 1
+  mkdir -m 700 "$state_dir" "$worktree" || return 1
+  FOREMAN_TMUX_SERVER_NAME="foreman-live-$$-${RANDOM}"
+  export FOREMAN_TMUX_SERVER_NAME
+  unset TMUX
   diagnosis="$state_dir/tmux-diagnosis.json"
   foreman_tmux_diagnose live-tmux "$diagnosis" || return 1
   executable=$(foreman_adapter_executable agent codex) || return 1
   live_write_fake_worker "$fake_bin" "$executable" || return 1
   PATH="$fake_bin:$PATH"
   export PATH
-  TMUX_TMPDIR=$socket_dir
-  export TMUX_TMPDIR
   printf 'Run the harmless live runtime check.\n' >"$state_dir/brief.md" || return 1
   request="$state_dir/request.json"
   spec="$state_dir/launch.json"

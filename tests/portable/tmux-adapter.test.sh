@@ -21,6 +21,9 @@ printf '%s\n' \
   '#!/usr/bin/env bash' \
   'set -u' \
   'state=${FAKE_TMUX_STATE:?}' \
+  'server=${FOREMAN_TMUX_SERVER_NAME:?}' \
+  '[ "${1:-}" = -L ] && [ "${2:-}" = "$server" ] || exit 64' \
+  'shift 2' \
   'command=${1:-}' \
   'shift || true' \
   'case "$command" in' \
@@ -57,7 +60,8 @@ printf '%s\n' \
 chmod +x "$fakebin/tmux"
 PATH="$fakebin:$PATH"
 FAKE_TMUX_STATE=$fake_state
-export PATH FAKE_TMUX_STATE
+FOREMAN_TMUX_SERVER_NAME=foreman-test-01
+export PATH FAKE_TMUX_STATE FOREMAN_TMUX_SERVER_NAME
 printf 'Complete the bounded task and return the required JSON result.\n' >"$task_state/brief.md"
 
 write_launch_spec() {
