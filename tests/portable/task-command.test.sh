@@ -179,6 +179,8 @@ test_reconcile_preserves_absence_and_recovers_proven_liveness() {
   output=$(FOREMAN_HOME="$home" "$foreman" task reconcile --project task-project --task "$task_id") \
     || test_fail 'reconcile did not preserve an absent endpoint as a missing condition'
   test_assert_contains "$output" 'Condition: missing' 'missing endpoint was not reported as a durable condition'
+  test_assert_contains "$output" 'Worker evidence: terminal result is not yet complete' \
+    'reconciliation did not distinguish incomplete durable worker evidence'
   jq -e '.lifecycle.status == "running" and .lifecycle.condition == "missing" and .lifecycle.sequence == 4' "$task_file" >/dev/null || \
     test_fail 'missing endpoint did not preserve the stable running lifecycle'
   jq -e '.state == "missing"' "$endpoint" >/dev/null || test_fail 'endpoint absence was not recorded'
@@ -221,6 +223,94 @@ test_validate_prepares_a_local_change_handoff_after_terminal_evidence() {
   [ "$(wc -l <"$project_root/tasks/$task_id/events.jsonl" | tr -d ' ')" = 9 ] || \
     test_fail 'validation and handoff preparation did not preserve lifecycle history'
   test_pass 'terminal change evidence runs validation and produces a local-only handoff'
+}
+
+test_teardown_requires_explicit_authority_and_proves_local_landing() {
+  local task_id task_file worktree head output status teardown_record event_count
+  task_id=${FOREMAN_TEST_TASK_ID:-}
+  [ -n "$task_id" ] || test_fail 'prior task fixture did not expose a task identity'
+  task_file="$project_root/tasks/$task_id/task.json"
+  worktree=$(jq -r '.worktree.path' "$task_file")
+
+  set +e
+  output=$(FOREMAN_HOME="$home" "$foreman" task teardown --project task-project --task "$task_id" 2>&1)
+  status=$?
+  set -e
+  [ "$status" -ne 0 ] || test_fail 'teardown accepted no explicit authority'
+  test_assert_contains "$output" 'requires exactly one of --landed-at or --discard' \
+    'missing teardown authority was unclear'
+  [ -d "$worktree" ] || test_fail 'authority refusal removed a task worktree'
+
+  head=$(git -C "$worktree" rev-parse HEAD)
+  set +e
+  output=$(FOREMAN_HOME="$home" "$foreman" task teardown --project task-project --task "$task_id" --landed-at "$head" 2>&1)
+  status=$?
+  set -e
+  [ "$status" -ne 0 ] || test_fail 'teardown accepted an unlanded change as landed'
+  test_assert_contains "$output" 'managed repository current HEAD' 'unlanded change refusal was unclear'
+  [ -d "$worktree" ] || test_fail 'unlanded-change refusal removed a task worktree'
+
+  git -C "$repository" merge --ff-only -q feat/task-command || test_fail 'fixture could not locally land the exact task branch'
+  head=$(git -C "$repository" rev-parse HEAD)
+  output=$(FOREMAN_HOME="$home" "$foreman" task teardown --project task-project --task "$task_id" --landed-at "$head") \
+    || test_fail 'teardown did not remove a proven locally landed worktree'
+  test_assert_contains "$output" "Closed task $task_id" 'successful teardown did not report the exact task closure'
+  [ ! -e "$worktree" ] && [ ! -L "$worktree" ] || test_fail 'landed task worktree remains after teardown'
+  teardown_record=$(jq -r '.artifacts.teardown' "$task_file")
+  foreman_task_validate_teardown_record "$teardown_record" || test_fail 'landed teardown record is invalid'
+  jq -e --arg head "$head" '
+    .lifecycle.status == "closed" and .lifecycle.condition == null and
+    .artifacts.teardown != null
+  ' "$task_file" >/dev/null || test_fail 'landed teardown did not close durable task state'
+  jq -e --arg head "$head" '
+    .authority == {kind:"confirmed-local-landing", landing_commit:$head} and
+    .worktree.head_commit == $head and .outcome == "closed" and .completed_at != null
+  ' "$teardown_record" >/dev/null || test_fail 'landed teardown record lacks exact landing evidence'
+  event_count=$(wc -l <"$project_root/tasks/$task_id/events.jsonl" | tr -d ' ')
+  test_assert_equal "$event_count" 12 'landed teardown did not append its complete durable lifecycle evidence'
+  output=$(FOREMAN_HOME="$home" "$foreman" task reconcile --project task-project --task "$task_id") \
+    || test_fail 'closed task reconciliation should remain a read-only acknowledgement'
+  test_assert_contains "$output" "Task $task_id is already closed" 'closed task reconciliation was unclear'
+  test_pass 'teardown requires explicit authority and removes only a proven locally landed worktree'
+}
+
+test_explicit_discard_removes_only_the_exact_task_owned_worktree() {
+  local plan_id output task_id task_file worktree session teardown_record repository_head
+  plan_id=$(create_plan 'Discard task') || test_fail 'could not create explicit-discard plan'
+  approve_plan "$plan_id" || test_fail 'could not approve explicit-discard plan'
+  output=$(FOREMAN_HOME="$home" "$foreman" task start --project task-project --plan "$plan_id" --task health-summary --branch feat/discard-task) \
+    || test_fail 'could not start explicit-discard task'
+  task_id=$(task_id_from_output "$output")
+  [ -n "$task_id" ] || test_fail 'explicit-discard task did not have a durable identity'
+  task_file="$project_root/tasks/$task_id/task.json"
+  worktree=$(jq -r '.worktree.path' "$task_file")
+  session="foreman-task-${task_id#task-}"
+  printf 'discarded change\n' >"$worktree/RESULT.md"
+  git -C "$worktree" add RESULT.md
+  git -C "$worktree" commit -qm 'Add discarded result'
+  rm -f -- "$fake_tmux_state/$session"
+  printf '%s\n%s\n' '{"type":"thread.started"}' '{"type":"turn.completed"}' >"$project_root/tasks/$task_id/codex-events.jsonl"
+  printf '%s\n' '{"status":"completed","summary":"Prepared a change that the maintainer explicitly discarded.","changed_files":["RESULT.md"],"risks":[]}' >"$project_root/tasks/$task_id/codex-final.json"
+  FOREMAN_HOME="$home" "$foreman" task validate --project task-project --task "$task_id" >/dev/null \
+    || test_fail 'explicit-discard task did not reach local handoff state'
+  printf 'uncommitted and explicitly discarded\n' >"$worktree/DISCARD.md"
+  repository_head=$(git -C "$repository" rev-parse HEAD)
+  output=$(FOREMAN_HOME="$home" "$foreman" task teardown --project task-project --task "$task_id" --discard) \
+    || test_fail 'explicit discard did not remove the exact task worktree'
+  test_assert_contains "$output" "Closed task $task_id" 'explicit discard did not report the exact task closure'
+  [ ! -e "$worktree" ] && [ ! -L "$worktree" ] || test_fail 'explicit discard left its task worktree present'
+  test_assert_equal "$(git -C "$repository" rev-parse HEAD)" "$repository_head" \
+    'explicit discard changed the managed repository current branch'
+  teardown_record=$(jq -r '.artifacts.teardown' "$task_file")
+  foreman_task_validate_teardown_record "$teardown_record" || test_fail 'explicit discard teardown record is invalid'
+  jq -e '
+    .lifecycle.status == "closed" and
+    .artifacts.teardown != null
+  ' "$task_file" >/dev/null || test_fail 'explicit discard did not close durable task state'
+  jq -e '
+    .authority == {kind:"explicit-discard", landing_commit:null} and .outcome == "closed"
+  ' "$teardown_record" >/dev/null || test_fail 'explicit discard record lacks explicit exact-task authority'
+  test_pass 'explicit discard removes unlanded task work only after an exact-task authority request'
 }
 
 test_validate_prepares_an_always_dark_research_report() {
@@ -309,6 +399,8 @@ test_start_requires_an_approved_plan_and_explicit_change_branch
 test_start_persists_identity_before_launch_and_status_is_read_only
 test_reconcile_preserves_absence_and_recovers_proven_liveness
 test_validate_prepares_a_local_change_handoff_after_terminal_evidence
+test_teardown_requires_explicit_authority_and_proves_local_landing
+test_explicit_discard_removes_only_the_exact_task_owned_worktree
 test_validate_prepares_an_always_dark_research_report
 test_unavailable_preflight_creates_no_new_task_state
 test_task_metadata_cannot_redirect_runtime_state

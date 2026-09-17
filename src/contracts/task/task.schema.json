@@ -50,7 +50,7 @@
     "artifacts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["brief", "events", "validation_directory", "result", "handoff", "report", "findings"],
+      "required": ["brief", "events", "validation_directory", "result", "handoff", "report", "findings", "teardown"],
       "properties": {
         "brief": {"$ref": "#/$defs/nullablePath"},
         "events": {"$ref": "#/$defs/absolutePath"},
@@ -58,7 +58,8 @@
         "result": {"$ref": "#/$defs/nullablePath"},
         "handoff": {"$ref": "#/$defs/nullablePath"},
         "report": {"$ref": "#/$defs/nullablePath"},
-        "findings": {"$ref": "#/$defs/nullablePath"}
+        "findings": {"$ref": "#/$defs/nullablePath"},
+        "teardown": {"$ref": "#/$defs/nullablePath"}
       }
     }
   },

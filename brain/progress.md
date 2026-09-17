@@ -4,7 +4,7 @@
 
 Phase 1 merged to `main` through pull request #1 as `65cbfb1`. Phase 2 is approved and active on `feat/phase-2`.
 
-Foreman has a tested foundation for project registration, reviewed plan intake, task launch and reconciliation, and local terminal-result validation. It intentionally cannot yet recover all interrupted outcomes, deliver changes remotely, merge, or tear down task environments. P2-000 through P2-007 are complete; P2-008 is the active implementation task. No execution capability is represented as supported yet.
+Foreman has a tested foundation for project registration, reviewed plan intake, task launch, reconciliation, local terminal-result validation, and safe local task-worktree teardown. It intentionally cannot yet represent Codex CLI or tmux as supported, deliver changes remotely, or merge work. P2-000 through P2-008 are complete; P2-009 is the active verification task.
 
 ## Completed product foundation
 
@@ -99,6 +99,8 @@ No unresolved Phase 1 blocker remains.
 - Start persists the immutable task identity, configuration snapshot, exact-base worktree marker, owned endpoint reservation, launch specification, task metadata, and append-only lifecycle events before creating the tmux session. `task status` remains read-only; `task reconcile` records missing or unreachable conditions without cleanup and resumes supervision only after exact endpoint liveness is proven. Task references must remain inside the exact task directory and retain their recorded SHA-256 identity. The portable task-command suite covers normal start, branch and approval refusal, unavailable adapters, read-only status, missing-endpoint preservation, proven recovery, and redirected-state refusal. The full suite passed with fourteen portable test files.
 - P2-007 completed on 16 September 2026. `foreman task validate` requires a non-active task endpoint and a bounded, structured Codex terminal result before it clears an earlier condition or progresses the lifecycle. It runs the registered and task-declared validation commands in the exact task worktree, preserving command, output, exit status, hash, and evidence as versioned records.
 - A successful change task must retain a clean task-owned branch with a commit beyond its exact base. Foreman produces a local handoff and result only; it does not push, publish, merge, land, discard, or tear down the worktree. A successful research task must remain clean and at its exact detached base; it receives a structured finding and a standalone report named `report-{slug}.html` with embedded always-dark CSS. Portable end-to-end fakes prove both flows, and the full suite continues to pass with fourteen portable test files.
+- P2-008 completed on 17 September 2026. `task reconcile` now proves the external ownership marker, exact Git worktree root, common Git directory, branch or detached state, base ancestry, and available structured Codex output before reporting recovery. A mismatched worktree becomes an `unknown` condition and remains preserved; an absent endpoint records whether terminal worker evidence is available for `task validate`.
+- `task teardown` accepts only `--landed-at` for a change task whose exact handoff commit is proven incorporated in the clean managed repository current `HEAD`, or explicit `--discard` for that exact task. Research tasks have no landing path and require explicit discard. Teardown refuses active, unknown, or otherwise unproven endpoints; retains task metadata, ownership marker, append-only events, and a strict teardown record; and can finish a prior interrupted removal only after proving that the exact worktree is already absent and unregistered. The portable suite proves authority refusal, false-landing refusal, locally landed teardown, forceful exact-worktree discard, closed-task recovery, and durable record validation. All fourteen portable test files pass.
 
 ## Confirmed risks carried forward
 
@@ -110,4 +112,4 @@ No unresolved Phase 1 blocker remains.
 
 ## Next verified checkpoint
 
-Complete P2-008's recovery and teardown evidence. Do not represent Codex CLI or tmux as supported until their implementation and opt-in live verification evidence exist.
+Complete P2-009's portable and opt-in live adapter verification evidence. Do not represent Codex CLI or tmux as supported until that evidence exists.

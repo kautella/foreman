@@ -35,6 +35,7 @@
     "result": null,
     "handoff": null,
     "report": null,
-    "findings": null
+    "findings": null,
+    "teardown": null
   }
 }

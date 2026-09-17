@@ -51,10 +51,11 @@ foreman_task_validate_metadata() {
       (.updated_at | timestamp) and (.sequence | type == "number" and floor == . and . >= 0);
     def nullable_path: . == null or path;
     def artifacts:
-      exact(["brief", "events", "findings", "handoff", "report", "result", "validation_directory"]) and
+      exact(["brief", "events", "findings", "handoff", "report", "result", "teardown", "validation_directory"]) and
       (.brief | nullable_path) and (.events | path) and
       (.validation_directory | nullable_path) and (.result | nullable_path) and
-      (.handoff | nullable_path) and (.report | nullable_path) and (.findings | nullable_path);
+      (.handoff | nullable_path) and (.report | nullable_path) and (.findings | nullable_path) and
+      (.teardown | nullable_path);
 
     exact(["artifacts", "configuration_snapshot", "identity", "lifecycle", "plan", "project_slug", "runtime_endpoint", "schema_version", "task", "task_id", "worktree"]) and
     .schema_version == 1 and
@@ -80,7 +81,7 @@ foreman_task_validate_metadata() {
       .configuration_snapshot != null and .worktree != null and .runtime_endpoint != null and
       (.artifacts.brief | path) and (.artifacts.validation_directory | path)
      else true end) and
-    (if .lifecycle.status == "closed" then .lifecycle.condition == null else true end)
+    (if .lifecycle.status == "closed" then .lifecycle.condition == null and (.artifacts.teardown | path) else true end)
   ' "$file" >/dev/null 2>&1 || {
     foreman_task_error "task metadata does not match src/contracts/task/task.schema.json: $file"
     return 1
@@ -151,6 +152,37 @@ foreman_task_validate_endpoint() {
   }
 }
 
+foreman_task_validate_teardown_record() {
+  local file=$1
+
+  foreman_task_require_json "$file" 'teardown record' || return 1
+  jq -e '
+    def exact($allowed): type == "object" and keys == ($allowed | sort);
+    def nonempty: type == "string" and length > 0;
+    def path: nonempty and startswith("/");
+    def commit: type == "string" and test("^[0-9a-f]{40}([0-9a-f]{24})?$");
+    def timestamp: type == "string" and test("^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$");
+    exact(["authority", "completed_at", "outcome", "requested_at", "runtime_endpoint", "schema_version", "task_id", "teardown_id", "worktree"]) and
+    .schema_version == 1 and
+    (.teardown_id | type == "string" and test("^teardown-[0-9a-f]{12}$")) and
+    (.task_id | type == "string" and test("^task-[0-9a-f]{12}$")) and (.requested_at | timestamp) and
+    (.authority | exact(["kind", "landing_commit"]) and
+      (.kind | IN("confirmed-local-landing", "explicit-discard")) and
+      (.landing_commit == null or (.landing_commit | commit)) and
+      (if .kind == "confirmed-local-landing" then (.landing_commit | commit) else .landing_commit == null end)) and
+    (.worktree | exact(["base_commit", "branch", "git_dir", "head_commit", "ownership_marker", "path"]) and
+      (.path | path) and (.git_dir | path) and (.branch == null or (.branch | nonempty)) and
+      (.base_commit | commit) and (.head_commit | commit) and (.ownership_marker | path)) and
+    (.runtime_endpoint | exact(["path", "state"]) and (.path | path) and (.state | IN("missing", "exited", "closed"))) and
+    (.outcome | IN("authorized", "closed")) and
+    (.completed_at == null or (.completed_at | timestamp)) and
+    (if .outcome == "authorized" then .completed_at == null else (.completed_at | timestamp) end)
+  ' "$file" >/dev/null 2>&1 || {
+    foreman_task_error "teardown record does not match src/contracts/task/teardown-record.schema.json: $file"
+    return 1
+  }
+}
+
 foreman_task_validate_lifecycle_transition() {
   local task_type=$1 from_status=$2 from_condition=$3 to_status=$4 to_condition=$5
 
@@ -210,6 +242,7 @@ foreman_task_validate_lifecycle_transition() {
     change:validated:delivery-ready|change:validated:change-request-ready|\
     research:validated:report-ready|\
     change:delivery-ready:landed|change:change-request-ready:landed|\
+    change:delivery-ready:teardown-ready|change:change-request-ready:teardown-ready|\
     change:landed:teardown-ready|research:report-ready:teardown-ready|\
     change:teardown-ready:closed|research:teardown-ready:closed)
       return 0

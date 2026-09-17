@@ -2,7 +2,7 @@
 
 ## Current objective
 
-Execute the approved Phase 2 local-only Codex CLI and tmux vertical slice. P2-000 upstream intake through P2-007 validation and local handoffs are complete; P2-008 recovery and safe teardown is the active task.
+Execute the approved Phase 2 local-only Codex CLI and tmux vertical slice. P2-000 upstream intake through P2-008 recovery and safe teardown are complete; P2-009 verification evidence is the active task.
 
 ## Established state
 
@@ -59,5 +59,6 @@ Phase 2 is active on `feat/phase-2`. It implements one local-only vertical slice
 6. P2-005 is complete: tmux endpoint reservation, launch, inspection, bounded capture, and exact-owned closure have portable evidence.
 7. P2-006 is complete: the public task command starts, observes, and reconciles one durably identified local task.
 8. P2-007 is complete: terminal worker evidence, declared validation, local handoffs, and dark research reports are durable.
-9. P2-008 recovers interrupted task state and permits only safe teardown.
-10. P2-009 and P2-010 complete live verification and Phase 2 readiness evidence.
+9. P2-008 is complete: reconciliation verifies task-owned Git identity and available worker evidence, while teardown requires either proven local landing or an explicit exact-task discard authority.
+10. P2-009 establishes portable and opt-in live adapter verification evidence.
+11. P2-010 publishes the Phase 2 readiness evidence.

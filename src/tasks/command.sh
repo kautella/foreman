@@ -30,6 +30,8 @@ Commands:
                                    Reconcile one task against its tmux endpoint
   validate --project SLUG --task TASK_ID
                                    Validate terminal work and prepare local output
+  teardown --project SLUG --task TASK_ID (--landed-at COMMIT | --discard)
+                                   Remove only a proven-landed or explicitly discarded worktree
 
 A change task requires an explicit, new branch name. A research task must not
 receive a branch. Task start never pushes, publishes, merges, lands, discards,
@@ -140,7 +142,7 @@ foreman_task_load_metadata() {
 
 foreman_task_validate_loaded_references() {
   local task_directory=$1 task_file=$2 task_id task_type snapshot snapshot_sha endpoint endpoint_sha
-  local event_file marker worktree_path event_sequence lifecycle_sequence
+  local event_file marker worktree_path teardown event_sequence lifecycle_sequence
 
   task_id=$(jq -r '.task_id' "$task_file")
   task_type=$(jq -r '.task.type' "$task_file")
@@ -152,9 +154,15 @@ foreman_task_validate_loaded_references() {
   marker=$(jq -r '.worktree.ownership_marker' "$task_file")
   worktree_path=$(jq -r '.worktree.path' "$task_file")
 
+  teardown=$(jq -r '.artifacts.teardown // "null"' "$task_file")
+
   [ "$snapshot" = "$task_directory/configuration.json" ] && [ "$endpoint" = "$task_directory/endpoint.json" ] && \
     [ "$event_file" = "$task_directory/events.jsonl" ] && [ "$marker" = "$task_directory/worktree.json" ] || {
     foreman_task_command_error 'task metadata references state outside its exact task directory'
+    return 1
+  }
+  [ "$teardown" = null ] || [ "$teardown" = "$task_directory/teardown.json" ] || {
+    foreman_task_command_error 'task metadata references teardown state outside its exact task directory'
     return 1
   }
   foreman_task_validate_configuration_snapshot "$snapshot" || return 1
@@ -184,6 +192,13 @@ foreman_task_validate_loaded_references() {
     foreman_task_command_error 'worktree marker does not match task metadata'
     return 1
   }
+  if [ "$teardown" != null ]; then
+    foreman_task_validate_teardown_record "$teardown" || return 1
+    jq -e --arg task_id "$task_id" '.task_id == $task_id' "$teardown" >/dev/null 2>&1 || {
+      foreman_task_command_error 'teardown record does not match task identity'
+      return 1
+    }
+  fi
   event_sequence=$(foreman_events_validate_existing "$event_file" "$task_type" "$task_id") || return 1
   lifecycle_sequence=$(jq -r '.lifecycle.sequence' "$task_file")
   [ "$event_sequence" = "$lifecycle_sequence" ] || {
@@ -396,7 +411,8 @@ foreman_task_write_metadata() {
           result: null,
           handoff: null,
           report: null,
-          findings: null
+          findings: null,
+          teardown: null
         }
       }
     ' "$plan_file" >"$temporary" ||
@@ -501,8 +517,8 @@ foreman_task_transition() {
 }
 
 foreman_task_record_condition() {
-  local task_file=$1 task_type=$2 condition=$3
-  local from_status from_condition sequence
+  local task_file=$1 task_type=$2 condition=$3 actor=${4:-runtime-adapter} message=${5:-}
+  local evidence_json=${6:-} from_status from_condition sequence
 
   from_status=$(jq -r '.lifecycle.status' "$task_file")
   from_condition=$(jq -r '.lifecycle.condition // "null"' "$task_file")
@@ -510,11 +526,13 @@ foreman_task_record_condition() {
     [ "$from_condition" = "$condition" ]
     return
   }
+  [ -n "$message" ] || message="Observed a $condition condition; task work was preserved."
+  [ -n "$evidence_json" ] || evidence_json="$(foreman_task_evidence "$(jq -r '.runtime_endpoint.path' "$task_file")")"
   sequence=$(jq '.lifecycle.sequence + 1' "$task_file")
   foreman_task_transition "$task_file" "$task_type" "$from_status" "$condition" || return 1
   foreman_task_append_event "${task_file%/*}" "$task_type" "$(jq -r '.project_slug' "$task_file")" "$(jq -r '.task_id' "$task_file")" \
-    "$FOREMAN_TASK_LOCK_ID" "$sequence" condition-observed runtime-adapter "$from_status" null "$from_status" "$condition" \
-    "Observed a $condition runtime condition; task work was preserved." "$(foreman_task_evidence "$(jq -r '.runtime_endpoint.path' "$task_file")")"
+    "$FOREMAN_TASK_LOCK_ID" "$sequence" condition-observed "$actor" "$from_status" null "$from_status" "$condition" \
+    "$message" "$evidence_json"
 }
 
 foreman_task_start_command() {
@@ -699,8 +717,8 @@ foreman_task_status_command() {
 }
 
 foreman_task_reconcile_command() {
-  local project_slug='' task_id='' task_type endpoint task_lock lock_id endpoint_state current_condition current_status sequence
-  local status
+  local project_slug='' task_id='' task_type endpoint task_lock lock_id endpoint_state current_condition current_status sequence worktree_head
+  local status inspection evidence_state
 
   while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -716,12 +734,56 @@ foreman_task_reconcile_command() {
   }
   foreman_task_load_metadata "$project_slug" "$task_id" || return 1
   task_type=$(jq -r '.task.type' "$FOREMAN_TASK_FILE")
+  current_status=$(jq -r '.lifecycle.status' "$FOREMAN_TASK_FILE")
+  if [ "$current_status" = closed ]; then
+    printf 'Task %s is already closed\n' "$task_id"
+    return 0
+  fi
   endpoint=$(jq -r '.runtime_endpoint.path' "$FOREMAN_TASK_FILE")
   task_lock="$FOREMAN_TASK_DIRECTORY/task.lock"
   lock_id="reconcile-task-${task_id#task-}-$$"
   foreman_lock_acquire task "$task_lock" "$project_slug" "$task_id" "$lock_id" || return 1
   FOREMAN_TASK_LOCK_ID=$lock_id
   export FOREMAN_TASK_LOCK_ID
+  if worktree_head=$(foreman_task_recovery_worktree_head "$FOREMAN_TASK_FILE"); then
+    status=0
+  else
+    status=$?
+  fi
+  if [ "$status" -ne 0 ]; then
+    current_condition=$(jq -r '.lifecycle.condition // "null"' "$FOREMAN_TASK_FILE")
+    if [ "$current_condition" = null ]; then
+      foreman_task_record_condition "$FOREMAN_TASK_FILE" "$task_type" unknown recovery \
+        'Could not prove the exact task-owned Git worktree identity; task work was preserved.' \
+        "$(foreman_task_evidence "$(jq -r '.worktree.ownership_marker' "$FOREMAN_TASK_FILE")")" || status=$?
+    fi
+    foreman_lock_release task "$task_lock" "$project_slug" "$task_id" "$lock_id" || return 1
+    foreman_task_command_error "Git reconciliation could not prove task identity; preserved task as unknown: $task_id"
+    return "${status:-1}"
+  fi
+  case "$current_status" in
+    delivery-ready|change-request-ready|report-ready|landed|teardown-ready)
+      endpoint_state=$(jq -r '.state' "$endpoint")
+      case "$endpoint_state" in
+        missing|exited|closed) ;;
+        *)
+          foreman_task_record_condition "$FOREMAN_TASK_FILE" "$task_type" unknown recovery \
+            'A terminal task retained an unproven runtime endpoint; task work was preserved.' \
+            "$(foreman_task_evidence "$endpoint")" || status=$?
+          status=1
+          foreman_lock_release task "$task_lock" "$project_slug" "$task_id" "$lock_id" || return 1
+          foreman_task_command_error "terminal task has an unproven runtime endpoint; preserved task as unknown: $task_id"
+          return "${status:-1}"
+          ;;
+      esac
+      foreman_lock_release task "$task_lock" "$project_slug" "$task_id" "$lock_id" || return 1
+      printf 'Reconciled task %s\n' "$task_id"
+      printf 'Lifecycle: %s\n' "$current_status"
+      printf 'Condition: none\n'
+      printf 'Endpoint state: %s\n' "$endpoint_state"
+      return 0
+      ;;
+  esac
   if foreman_tmux_inspect "$endpoint" "$project_slug" "$task_lock" "$lock_id"; then
     status=0
   else
@@ -742,6 +804,12 @@ foreman_task_reconcile_command() {
   current_status=$(jq -r '.lifecycle.status' "$FOREMAN_TASK_FILE")
   if [ "${status:-0}" -eq 0 ] && [ "$endpoint_state" = missing ] && [ "$current_condition" = null ]; then
     foreman_task_record_condition "$FOREMAN_TASK_FILE" "$task_type" missing || status=$?
+    inspection="$FOREMAN_TASK_DIRECTORY/recovery-codex-inspection.json"
+    if foreman_codex_collect_result "$FOREMAN_TASK_DIRECTORY/codex-launch.json" "$inspection" >/dev/null 2>&1; then
+      evidence_state=available
+    else
+      evidence_state=incomplete
+    fi
   elif [ "${status:-0}" -eq 0 ] && [ "$endpoint_state" = active ] && [ "$current_condition" != null ]; then
     sequence=$(jq '.lifecycle.sequence + 1' "$FOREMAN_TASK_FILE")
     if foreman_task_transition "$FOREMAN_TASK_FILE" "$task_type" awaiting-reconciliation null && \
@@ -761,10 +829,17 @@ foreman_task_reconcile_command() {
   printf 'Lifecycle: %s\n' "$(jq -r '.lifecycle.status' "$FOREMAN_TASK_FILE")"
   printf 'Condition: %s\n' "$(jq -r '.lifecycle.condition // "none"' "$FOREMAN_TASK_FILE")"
   printf 'Endpoint state: %s\n' "$(jq -r '.state' "$endpoint")"
+  if [ "${evidence_state:-}" = available ]; then
+    printf 'Worker evidence: terminal result is ready for validation\n'
+  elif [ "${evidence_state:-}" = incomplete ]; then
+    printf 'Worker evidence: terminal result is not yet complete\n'
+  fi
 }
 
 # shellcheck source=src/tasks/complete.sh
 . "$FOREMAN_SOURCE_ROOT/src/tasks/complete.sh"
+# shellcheck source=src/tasks/teardown.sh
+. "$FOREMAN_SOURCE_ROOT/src/tasks/teardown.sh"
 
 foreman_task_command() {
   local command=${1:-help}
@@ -775,6 +850,7 @@ foreman_task_command() {
     status) shift; foreman_task_status_command "$@" ;;
   reconcile) shift; foreman_task_reconcile_command "$@" ;;
   validate) shift; foreman_task_validate_command "$@" ;;
+  teardown) shift; foreman_task_teardown_command "$@" ;;
     *) foreman_task_command_error "unknown task command: $command"; foreman_task_usage >&2; return 64 ;;
   esac
 }

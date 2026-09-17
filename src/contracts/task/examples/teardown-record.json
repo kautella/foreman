@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "teardown_id": "teardown-0123456789ab",
+  "task_id": "task-0123456789ab",
+  "requested_at": "2026-09-16T09:00:00Z",
+  "authority": {
+    "kind": "confirmed-local-landing",
+    "landing_commit": "0123456789abcdef0123456789abcdef01234567"
+  },
+  "worktree": {
+    "path": "/worktrees/sample-project/task-0123456789ab",
+    "git_dir": "/work/sample-project/.git/worktrees/task-0123456789ab",
+    "branch": "feat/task-0123456789ab",
+    "base_commit": "0123456789abcdef0123456789abcdef01234567",
+    "head_commit": "0123456789abcdef0123456789abcdef01234567",
+    "ownership_marker": "/state/tasks/task-0123456789ab/worktree.json"
+  },
+  "runtime_endpoint": {
+    "path": "/state/tasks/task-0123456789ab/endpoint.json",
+    "state": "missing"
+  },
+  "outcome": "closed",
+  "completed_at": "2026-09-16T09:01:00Z"
+}

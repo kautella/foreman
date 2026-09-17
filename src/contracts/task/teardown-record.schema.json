@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foreman.local/contracts/task/teardown-record.schema.json",
+  "title": "Foreman task teardown record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "teardown_id", "task_id", "requested_at", "authority", "worktree", "runtime_endpoint", "outcome", "completed_at"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "teardown_id": {"type": "string", "pattern": "^teardown-[0-9a-f]{12}$"},
+    "task_id": {"type": "string", "pattern": "^task-[0-9a-f]{12}$"},
+    "requested_at": {"$ref": "#/$defs/timestamp"},
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "landing_commit"],
+      "properties": {
+        "kind": {"enum": ["confirmed-local-landing", "explicit-discard"]},
+        "landing_commit": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/gitCommit"}]}
+      }
+    },
+    "worktree": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "git_dir", "branch", "base_commit", "head_commit", "ownership_marker"],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolutePath"},
+        "git_dir": {"$ref": "#/$defs/absolutePath"},
+        "branch": {"oneOf": [{"type": "null"}, {"type": "string", "minLength": 1}]},
+        "base_commit": {"$ref": "#/$defs/gitCommit"},
+        "head_commit": {"$ref": "#/$defs/gitCommit"},
+        "ownership_marker": {"$ref": "#/$defs/absolutePath"}
+      }
+    },
+    "runtime_endpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "state"],
+      "properties": {
+        "path": {"$ref": "#/$defs/absolutePath"},
+        "state": {"enum": ["missing", "exited", "closed"]}
+      }
+    },
+    "outcome": {"enum": ["authorized", "closed"]},
+    "completed_at": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/timestamp"}]}
+  },
+  "$defs": {
+    "absolutePath": {"type": "string", "pattern": "^/"},
+    "gitCommit": {"type": "string", "pattern": "^[0-9a-f]{40}(?:[0-9a-f]{24})?$"},
+    "timestamp": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"authority": {"properties": {"kind": {"const": "confirmed-local-landing"}}}}},
+      "then": {"properties": {"authority": {"properties": {"landing_commit": {"$ref": "#/$defs/gitCommit"}}}}}
+    },
+    {
+      "if": {"properties": {"authority": {"properties": {"kind": {"const": "explicit-discard"}}}}},
+      "then": {"properties": {"authority": {"properties": {"landing_commit": {"type": "null"}}}}}
+    },
+    {
+      "if": {"properties": {"outcome": {"const": "authorized"}}},
+      "then": {"properties": {"completed_at": {"type": "null"}}}
+    },
+    {
+      "if": {"properties": {"outcome": {"const": "closed"}}},
+      "then": {"properties": {"completed_at": {"$ref": "#/$defs/timestamp"}}}
+    }
+  ]
+}

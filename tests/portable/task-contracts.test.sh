@@ -29,6 +29,8 @@ test_examples_satisfy_task_contracts() {
     || test_fail 'local handoff example did not validate'
   foreman_task_validate_research_finding "$examples/research-finding.json" \
     || test_fail 'research finding example did not validate'
+  foreman_task_validate_teardown_record "$examples/teardown-record.json" \
+    || test_fail 'teardown record example did not validate'
   test_pass 'all durable task contract examples validate'
 }
 
@@ -76,6 +78,8 @@ test_lifecycle_transitions_and_conditions_fail_closed() {
     || test_fail 'validated research task could not become report-ready'
   foreman_task_validate_lifecycle_transition change delivery-ready null landed null \
     || test_fail 'delivery-ready change task could not record confirmed landing'
+  foreman_task_validate_lifecycle_transition change delivery-ready null teardown-ready null \
+    || test_fail 'delivery-ready change task could become teardown-ready after explicit discard'
   if foreman_task_validate_lifecycle_transition change approved null running null >/dev/null 2>&1; then
     test_fail 'lifecycle skipped prepared state'
   fi
