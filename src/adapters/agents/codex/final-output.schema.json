@@ -8,7 +8,7 @@
   "properties": {
     "status": {"enum": ["completed", "blocked", "failed"]},
     "summary": {"type": "string", "minLength": 1},
-    "changed_files": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
-    "risks": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+    "changed_files": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "risks": {"type": "array", "items": {"type": "string", "minLength": 1}}
   }
 }

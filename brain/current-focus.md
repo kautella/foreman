@@ -65,6 +65,6 @@ Phase 2 is active on `feat/phase-2`. It implements one local-only vertical slice
 
 ## Current verification boundary
 
-The host has tmux `3.7c` and Codex CLI `0.147.0`. The real tmux lifecycle passed with a harmless fake worker; its durable evidence is at `~/.foreman/projects/foreman/evidence/live-tmux-2026-09-17-retry-2/`. The harness now selects a unique short tmux server name through the adapter, avoiding macOS Unix-socket path limits while staying isolated from user sessions. The maintainer reports the Codex CLI is authenticated; the real task preflight will record that status before any worker begins.
+The host has tmux `3.7c` and Codex CLI `0.147.0`. The real tmux lifecycle passed with a harmless fake worker; its durable evidence is at `~/.foreman/projects/foreman/evidence/live-tmux-2026-09-17-retry-2/`. The harness now selects a unique short tmux server name through the adapter, avoiding macOS Unix-socket path limits while staying isolated from user sessions. The first real Codex preflight confirmed authentication, but Codex rejected the supplied structured-output schema before a worker result was produced because its `uniqueItems` constraint is unsupported. The revised schema leaves duplicate-value enforcement to Foreman's own validator.
 
 Do not run the real Codex mode until the maintainer explicitly authorizes that usage at the time of execution. Do not represent Codex CLI as supported until the live task passes and its evidence is reviewed.

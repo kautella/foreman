@@ -137,7 +137,7 @@ test_launch_spec_refuses_tampering_and_existing_output_paths() {
 }
 
 test_bounded_jsonl_and_structured_final_output_are_collected() {
-  local spec stream final result invalid_request invalid_spec invalid_stream invalid_final invalid_result status
+  local spec stream final result duplicate_final invalid_request invalid_spec invalid_stream invalid_final invalid_result status
   spec="$state/change-launch.json"
   stream=$(jq -r '.jsonl_path' "$spec")
   final=$(jq -r '.final_output_path' "$spec")
@@ -150,6 +150,15 @@ test_bounded_jsonl_and_structured_final_output_are_collected() {
     || test_fail 'collection did not produce a normalized adapter result'
   jq -e '.ok == true and .data.stream.records == 2 and .data.stream.terminal_event == "turn.completed" and .data.final.status == "completed"' \
     "$result" >/dev/null || test_fail 'collection result lost bounded stream or structured final evidence'
+
+  jq -e '[.. | objects | select(has("uniqueItems"))] | length == 0' \
+    "$repo_root/src/adapters/agents/codex/final-output.schema.json" >/dev/null \
+    || test_fail 'Codex output schema contains an unsupported uniqueItems constraint'
+  duplicate_final="$state/duplicate-final.json"
+  printf '%s\n' '{"status":"completed","summary":"Duplicate paths are invalid.","changed_files":["README.md","README.md"],"risks":[]}' >"$duplicate_final"
+  if foreman_codex_validate_final_output "$duplicate_final" >/dev/null 2>&1; then
+    test_fail 'Foreman accepted duplicate values after removing the API-incompatible schema constraint'
+  fi
 
   invalid_stream="$state/invalid-events.jsonl"
   invalid_final="$state/invalid-final.json"
