@@ -4788,6 +4788,24 @@ freshen_spawn_worktree_base() { # <worktree> <base-branch> <project> <mode>; 2 w
     fi
     return 2
   fi
+  # Local delivery deliberately starts from the project's local default branch.
+  # A retained archival origin must not turn an offline/local task into a fetch,
+  # or reset it behind commits already fast-forwarded locally.
+  if [ "$mode" = local-only ]; then
+    [ -z "$base" ] || { echo "error: local-only work cannot name a remote base branch" >&2; return 1; }
+    for default in main master; do
+      if git -C "$project" show-ref --verify --quiet "refs/heads/$default"; then
+        expected=$(git -C "$project" rev-parse "refs/heads/$default^{commit}")
+        if ! git -C "$worktree" reset --hard "$expected" >/dev/null; then
+          echo "error: could not reset pooled worktree '$worktree' to local $default" >&2
+          return 1
+        fi
+        return 0
+      fi
+    done
+    echo "error: local-only project '$project' has no local main or master branch" >&2
+    return 1
+  fi
   if ! spawn_worktree_has_origin_config "$worktree"; then
     [ -z "$base" ] || {
       echo "error: pooled worktree '$worktree' has no origin, so it cannot start from base branch '$base'" >&2

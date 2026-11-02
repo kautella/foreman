@@ -804,7 +804,7 @@ The author must act only on an explicit signal: a `CHANGES_REQUESTED` review dec
 Only author-actionable states, conflicts, and failing checks print; the maintainer and approval states remain recorded without waking the owning task.
 Reads are driven by the GitHub notifications feed: each pass makes one conditional read of it, which GitHub answers with an uncounted 304 while nothing changed, and reads only the owned PRs with new notification activity, PRs not yet read, and PRs whose last read did not settle.
 Every owned PR is still read when the feed is unavailable or returns a full page of notifications newer than the saved position, and at least every 15 minutes as the fallback sweep, because some conditions, such as a base branch moving into conflict or a check from another app failing, raise no notification.
-GitLab merge requests are not monitored yet.
+GitLab merge requests use the selected `provider=gitlab` contract and `glab` for merge-request creation, monitoring, and merge.
 When no reported check is marked required, a failing reported check still counts, matching `bin/fm-pr-state.sh` for unprotected stacked bases.
 When a required check has reported, optional failures do not notify.
 A conflict and an author action each wake once per latest commit, and a missing approval is recorded once per latest commit.
@@ -1183,25 +1183,23 @@ With the flag absent no pause is ever overdue, no such decision opens, and decla
 The flag is a home-local supervision preference and is not inherited by secondmate homes.
 `bin/fm-classify-lib.sh`'s `status_pause_is_overdue` owns the thresholds, and `bin/fm-watch.sh`'s `pause_overdue_reconcile` and `bin/fm-supervise-daemon.sh`'s `reconcile_overdue_pause` own when the decision closes.
 
-## Spawn base from the primary checkout (config/spawn-base-primary-checkout)
+## Local-first delivery (config/delivery-default)
 
-The optional local, gitignored `config/spawn-base-primary-checkout` presence flag opts this home into a default-off base for fresh task worktrees on projects that land work locally.
-Without it, every fresh ship or scout worktree on a project with an origin remote resets to `origin/<default>`, or to `origin/<base>` for a named base branch.
+The optional local, gitignored `config/delivery-default` contains exactly `local-only` or `publish-required`.
+It selects the fallback only for unregistered projects and never rewrites an existing registry row.
 
-### Which tasks it changes
+Absent or `local-only` makes local-only the default.
+It needs no remote, provider CLI, account, hosted CI, pull request, or network call.
+Fresh local-only work and local review always use the local `main` or `master` branch, even when an archival `origin` exists.
 
-With it present, a fresh local-only ship, or a scout spawned without `--base-branch`, starts from the primary checkout's `<default>` when that branch strictly contains origin's tip.
-A local-only project lands work there through `bin/fm-merge-local.sh` and never pushes, so `origin/<default>` stays at the last push, and a fresh task would otherwise start behind work already landed and load the project's instruction files from that stale tree.
-A no-mistakes or direct-PR ship and any task with a named base branch still start from origin's tip, because that work is delivered against origin.
-When the primary checkout's `<default>` and origin's have diverged, the spawn prints a note and starts from origin's tip.
-A project without an origin remote is unaffected, and a relaunch never changes the base a task already has.
+`publish-required` preserves the previous unregistered fallback of `no-mistakes off`.
+Remote-backed modes use their configured remote base as before.
+Provider choice is recorded explicitly in the registry as `provider=local|github|gitlab|gerrit|forgejo|external` and is never inferred from a remote during delivery.
+Legacy rows remain compatible.
+Use `bin/fm-project-migrate-provider.sh --dry-run` before its reversible `--apply` migration.
 
-`bin/fm-review-diff.sh` reads the same flag, so a local-only ship or a scout is reviewed against the branch it delivers to and its diff shows only its own work, while a no-mistakes or direct-PR ship stays anchored on `origin/<default>`.
-`bin/fm-promote.sh` reads it too, telling a scout promoted to no-mistakes or direct-PR on a project with an origin remote to return to origin's default branch rather than the primary checkout's.
-
-The flag is per home and is not inherited by secondmate homes, which keep their own project clones and opt in separately.
-Only its presence is read, at each fresh spawn, review, and promotion.
-The [`fm-spawn.sh` header](../bin/fm-spawn.sh) owns the exact base rule, and the [`fm-review-diff.sh` header](../bin/fm-review-diff.sh) owns the review anchor.
+The legacy `config/spawn-base-primary-checkout` flag is no longer needed for local-only work.
+The [`fm-spawn.sh` header](../bin/fm-spawn.sh) owns exact base selection, and [`fm-review-diff.sh`](../bin/fm-review-diff.sh) owns local review anchoring.
 
 ## Gate defaults (.no-mistakes.yaml)
 

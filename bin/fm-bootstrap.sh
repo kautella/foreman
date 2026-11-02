@@ -918,7 +918,24 @@ missing_tool_diagnostic() {
 # fm_backend_required_tools (bin/fm-backend.sh). So a herdr/zellij/cmux/tern home is
 # never told tmux is missing, and only orca drops treehouse. A backend value with
 # no verified dependency set is reported before the universal checks continue.
-COMMON_TOOLS="node git gh no-mistakes gh-axi chrome-devtools-axi tasks-axi quota-axi"
+# Local-first homes need only local tooling. Provider and pipeline tools are
+# added below from explicit registry capability declarations, never from remotes.
+COMMON_TOOLS="node git tasks-axi"
+PROJECTS_REGISTRY="$DATA/projects.md"
+github_delivery_enabled() {
+  [ -f "$PROJECTS_REGISTRY" ] || return 1
+  awk '
+    /^- / {
+      if ($0 ~ /provider=github/) found=1
+      if ($0 !~ /provider=/ && $0 !~ /forge=(gitlab|gerrit|forgejo|external)/ && $0 !~ /\[local-only([ ]|\])/) found=1
+    }
+    END { exit !found }
+  ' "$PROJECTS_REGISTRY"
+}
+gitlab_delivery_enabled() {
+  [ -f "$PROJECTS_REGISTRY" ] || return 1
+  grep -Eq '^-[[:space:]].*provider=gitlab' "$PROJECTS_REGISTRY"
+}
 BACKEND=$(fm_backend_name)
 BACKEND_VALID=1
 if ! BACKEND_TOOLS=$(fm_backend_required_tools "$BACKEND"); then
@@ -1547,7 +1564,7 @@ detect_local_tools() {
   if command -v no-mistakes >/dev/null 2>&1 && ! tool_version_at_least no-mistakes "$NO_MISTAKES_MIN"; then
     echo "OUTDATED: no-mistakes (installed: $(tool_version no-mistakes); requires $NO_MISTAKES_MIN; upgrade: $(upgrade_cmd no-mistakes))"
   fi
-  if command -v gh-axi >/dev/null 2>&1 && ! tool_version_at_least gh-axi "$GH_AXI_MIN"; then
+  if github_delivery_enabled && command -v gh-axi >/dev/null 2>&1 && ! tool_version_at_least gh-axi "$GH_AXI_MIN"; then
     echo "OUTDATED: gh-axi (installed: $(tool_version gh-axi); requires $GH_AXI_MIN; upgrade: $(upgrade_cmd gh-axi))"
   fi
   if ! tool_version_at_least lavish-axi "$LAVISH_AXI_BOARD_MIN"; then
@@ -1679,6 +1696,13 @@ detect_local_config() {
     echo "MISSING_MANUAL: cursor-agent (instructions: $(manual_install_url cursor-agent))"
   fi
   crew_dispatch_validate
+  if github_delivery_enabled; then
+    command -v gh >/dev/null 2>&1 || missing_tool_diagnostic gh
+    command -v gh-axi >/dev/null 2>&1 || missing_tool_diagnostic gh-axi
+  fi
+  if gitlab_delivery_enabled; then
+    command -v glab >/dev/null 2>&1 || missing_tool_diagnostic glab
+  fi
   if [ "${FM_BOOTSTRAP_VERBOSE_FACTS:-0}" = 1 ] \
     && ! fm_backlog_backend_manual "$CONFIG" && fm_tasks_axi_compatible; then
     echo "BOOTSTRAP_INFO: tasks-axi available"
@@ -1768,10 +1792,15 @@ detect_home_summary_publication() {
 # fleet_sync and others assign plain names like `start` without `local`, and
 # bash's dynamic scoping would let them overwrite a stamp held by a caller.
 local_phase && detect_local_tools
-if network_phase; then
+if network_phase && github_delivery_enabled; then
   __fm_timing_stamp=$(fm_timing_now_ms)
   gh auth status >/dev/null 2>&1 || echo "NEEDS_GH_AUTH"
   fm_timing_record phase gh-auth "$__fm_timing_stamp"
+fi
+if network_phase && gitlab_delivery_enabled; then
+  __fm_timing_stamp=$(fm_timing_now_ms)
+  glab auth status >/dev/null 2>&1 || echo "NEEDS_GITLAB_AUTH"
+  fm_timing_record phase gitlab-auth "$__fm_timing_stamp"
 fi
 local_phase && detect_local_config
 local_phase && [ -e "$CONFIG/record-hygiene" ] && record_hygiene_report

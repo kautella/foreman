@@ -67,7 +67,9 @@
 # forge=external block appends " forge=forgejo" or " forge=external". The "Ship branch: <branch>"
 # line under it is machine-readable the same way: bin/fm-spawn.sh refuses a ship
 # whose spawn-selected branch disagrees with it.
-# forge is none|gerrit|forgejo|external and defaults to none;
+# forge is the legacy name for the explicit delivery provider and is
+# none|github|gitlab|gerrit|forgejo|external. GitHub is the compatibility
+# meaning of none; local-only has provider=local and no forge command.
 # bin/fm-project-mode.sh's header owns what the registry binding means, and this
 # file owns what each forge changes for a WORKER (docs/gerrit-forge-integration.md
 # is the gerrit design and docs/external-review-forge.md the external one). In
@@ -189,9 +191,9 @@ fm_mode_publishes() {  # <mode>
 fm_forge_valid_for_mode() {  # <forge> <mode> <caller>
   local forge=$1 mode=$2 caller=$3
   case "$forge" in
-    none|gerrit|forgejo|external) ;;
+    none|github|gitlab|gerrit|forgejo|external) ;;
     *)
-      echo "error: $caller: unknown forge '$forge' (expected none, gerrit, forgejo, or external)" >&2
+      echo "error: $caller: unknown provider '$forge' (expected none, github, gitlab, gerrit, forgejo, or external)" >&2
       return 1 ;;
   esac
   if [ "$forge" != none ] && [ "$mode" = local-only ]; then
@@ -223,7 +225,7 @@ fm_pr_text_valid() {  # <pr> <mode> <forge> <caller>
     echo "error: $caller: pr=manual ships mode=no-mistakes only - direct-PR already leaves the PR text to the worker and local-only opens no PR" >&2
     return 1
   fi
-  if [ "$forge" != none ]; then
+  if [ "$forge" != none ] && [ "$forge" != github ] && [ "$forge" != gitlab ]; then
     echo "error: $caller: pr=manual ships on a GitHub-style forge with no forge binding only, not forge=$forge" >&2
     return 1
   fi
@@ -259,7 +261,7 @@ fm_base_branch_valid() {  # <base> <mode> <forge> <caller>
     echo "error: $caller: a base branch cannot ship mode=local-only, whose landing fast-forwards local main; ship no-mistakes or direct-PR, which open a pull request against the base" >&2
     return 1
   fi
-  if [ "$forge" != none ]; then
+  if [ "$forge" != none ] && [ "$forge" != github ]; then
     echo "error: $caller: a base branch is not supported on forge=$forge" >&2
     return 1
   fi
@@ -553,7 +555,11 @@ fm_dod_block() {  # <mode> <task-id> [branch] [<forge>] [<base>] [<consent>] [<p
     contract_consent=" upstream-consent=$consent"
   fi
   draft_check="(\`gh-axi pr view <number>\` must print \`draft: no\`, where <number> is the PR number from your PR URL); if it is a draft, mark it ready with \`gh-axi pr ready <number>\`."
-  if [ "$forge" = forgejo ]; then
+  if [ "$forge" = gitlab ]; then
+    contract_forge=' forge=gitlab'
+    forge_cli='fm-review-provider.sh gitlab'
+    draft_check="(\`fm-review-provider.sh gitlab status --url {url}\` must report \`draft: no\`; if it is a draft, mark it ready with \`fm-review-provider.sh gitlab ready --url {url}\`)."
+  elif [ "$forge" = forgejo ]; then
     contract_forge=' forge=forgejo'
     forge_cli=tea
     draft_check="(\`tea api --repo <owner>/<repo> /repos/{owner}/{repo}/pulls/<number>\` must show \`draft\` as false, where <owner>/<repo> and <number> come from your PR URL); Forgejo marks a draft by a work-in-progress title prefix such as \`WIP:\`, so if it is a draft, remove that prefix with \`tea pulls edit <number> --repo <owner>/<repo> --title '<title without the prefix>'\`."
