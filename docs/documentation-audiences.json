@@ -470,6 +470,10 @@
       "audience": "maintainer-architecture"
     },
     {
+      "path": "docs/gemini-primary.md",
+      "audience": "operator-current"
+    },
+    {
       "path": "docs/scripts.md",
       "audience": "operator-current"
     },
@@ -499,6 +503,10 @@
     },
     {
       "path": "docs/supervision-protocols/grok.md",
+      "audience": "agent-runtime"
+    },
+    {
+      "path": "docs/supervision-protocols/gemini.md",
       "audience": "agent-runtime"
     },
     {

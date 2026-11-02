@@ -14,9 +14,8 @@
 #      MainThread on modern Node/Linux, so ancestry does NOT reach it and the
 #      marker is the only detection path. The comm-name arm is pinned for a
 #      future natively-named binary.
-#   4. Gemini is a crewmate/scout adapter only: it has no primary supervision
-#      protocol, so its control mechanics are verified while a secondmate launch
-#      on it is refused.
+#   4. Gemini's worker control mechanics remain distinct from its opt-in primary
+#      launcher, and a secondmate launch remains refused.
 set -u
 
 # shellcheck source=tests/fixtures.sh
@@ -249,8 +248,8 @@ test_gemini_is_crewmate_and_scout_only() {
   fm_control_harness_supports_kind gemini scout \
     || fail "gemini must be verified for scout work"
   ! fm_control_harness_supports_kind gemini secondmate \
-    || fail "gemini has no primary supervision protocol and must be refused for secondmates"
-  pass "fm-control-lib.sh: gemini is a crewmate/scout adapter only"
+    || fail "gemini must remain refused for secondmates"
+  pass "fm-control-lib.sh: gemini supports worker tasks while secondmates remain refused"
 }
 
 test_gemini_wiring_stays_outside_the_worktree() {
