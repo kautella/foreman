@@ -95,7 +95,13 @@ default_branch() {
 }
 
 RECORDED_BASE=$(grep '^base_branch=' "$META" | cut -d= -f2- || true)
+MODE=$(grep '^mode=' "$META" | tail -1 | cut -d= -f2- || true)
 DEFAULT=$RECORDED_BASE
+if [ -z "$DEFAULT" ] && [ "$MODE" = local-only ]; then
+  for candidate in main master; do
+    if git -C "$PROJ" show-ref --verify --quiet "refs/heads/$candidate"; then DEFAULT=$candidate; break; fi
+  done
+fi
 [ -n "$DEFAULT" ] || DEFAULT=$(default_branch) || { echo "error: cannot determine default branch for $PROJ; expected origin/HEAD, main, or master" >&2; exit 1; }
 
 BRANCH=$(grep '^branch=' "$META" | cut -d= -f2- || true)
@@ -214,7 +220,13 @@ resolve_review_base() {
   printf '%s' "$DEFAULT"
 }
 
-if git -C "$PROJ" remote get-url origin >/dev/null 2>&1; then
+if [ "$MODE" = local-only ]; then
+  # Local reviews are intentionally offline even if an archival origin exists.
+  BASE="$DEFAULT"
+  if git -C "$WT" merge-base --is-ancestor "$COMPARE_REF" "$BASE" 2>/dev/null; then
+    echo "note: $BASE already contains $COMPARE_REF, so there is nothing left to review against it" >&2
+  fi
+elif git -C "$PROJ" remote get-url origin >/dev/null 2>&1; then
   # Update the remote-tracking ref itself; a bare single-branch fetch can leave
   # origin/<default> stale on some Git versions and only refresh FETCH_HEAD.
   git -C "$WT" fetch origin "+refs/heads/$DEFAULT:refs/remotes/origin/$DEFAULT" --quiet
@@ -222,7 +234,6 @@ if git -C "$PROJ" remote get-url origin >/dev/null 2>&1; then
   if [ -z "$RECORDED_BASE" ] && [ -e "$CONFIG/spawn-base-primary-checkout" ]; then
     # shellcheck source=bin/fm-dod-lib.sh
     . "$SCRIPT_DIR/fm-dod-lib.sh"
-    MODE=$(grep '^mode=' "$META" | tail -1 | cut -d= -f2- || true)
     BASE=$(resolve_review_base)
   fi
 else

@@ -112,6 +112,7 @@ fi
 SELF_UPDATE_SOURCE_FILE="$FM_HOME/config/self-update-source"
 SELF_UPDATE_REMOTE=""
 SELF_UPDATE_BRANCH=""
+SELF_UPDATE_LOCAL=""
 
 self_update_source_refuse() {  # <reason>
   echo "error: $SELF_UPDATE_SOURCE_FILE: $1; fix it or remove it to update from origin" >&2
@@ -121,7 +122,7 @@ self_update_source_refuse() {  # <reason>
 # Parse config/self-update-source into SELF_UPDATE_REMOTE and SELF_UPDATE_BRANCH.
 # Absent leaves both empty (the origin path); anything present but unusable exits.
 read_self_update_source() {
-  local content remote branch extra lines
+  local content remote branch extra lines local_path local_ref
   [ -e "$SELF_UPDATE_SOURCE_FILE" ] || [ -L "$SELF_UPDATE_SOURCE_FILE" ] || return 0
   if [ -L "$SELF_UPDATE_SOURCE_FILE" ] || [ ! -f "$SELF_UPDATE_SOURCE_FILE" ] \
     || [ ! -r "$SELF_UPDATE_SOURCE_FILE" ]; then
@@ -136,6 +137,18 @@ read_self_update_source() {
   read -r remote branch extra <<EOF
 $content
 EOF
+  if [ "$remote" = local ]; then
+    local_path=$branch
+    local_ref=$extra
+    [ -n "$local_path" ] && [ -n "$local_ref" ] || self_update_source_refuse "expected local <checkout-path> <ref>"
+    [ -d "$local_path" ] && git -C "$local_path" rev-parse --git-dir >/dev/null 2>&1 \
+      || self_update_source_refuse "local source '$local_path' is not a Git checkout"
+    git -C "$local_path" rev-parse --verify --quiet "$local_ref^{commit}" >/dev/null \
+      || self_update_source_refuse "local source ref '$local_ref' does not resolve"
+    SELF_UPDATE_LOCAL=$local_path
+    SELF_UPDATE_BRANCH=$local_ref
+    return 0
+  fi
   if [ -z "$remote" ] || [ -z "$branch" ] || [ -n "$extra" ]; then
     self_update_source_refuse "expected exactly one line \"<remote> <branch>\""
   fi
@@ -158,7 +171,18 @@ read_self_update_source
 # --- main firstmate repo ---------------------------------------------------
 
 reread_firstmate="no"
-if [ -n "$SELF_UPDATE_REMOTE" ]; then
+if [ -n "$SELF_UPDATE_LOCAL" ]; then
+  echo "self-update source: local $SELF_UPDATE_LOCAL $SELF_UPDATE_BRANCH (config/self-update-source)"
+  primary_base="refs/fm-local-update/source"
+  if git -C "$FM_ROOT" fetch --quiet --no-tags "$SELF_UPDATE_LOCAL" \
+    "+$SELF_UPDATE_BRANCH:$primary_base" 2>/dev/null; then
+    ff_target "$FM_ROOT" "firstmate" "$primary_base" no no
+  else
+    FF_STATUS="skipped"
+    FF_INSTR=""
+    echo "firstmate: skipped: import of local source $SELF_UPDATE_LOCAL $SELF_UPDATE_BRANCH failed"
+  fi
+elif [ -n "$SELF_UPDATE_REMOTE" ]; then
   echo "self-update source: $SELF_UPDATE_REMOTE $SELF_UPDATE_BRANCH (config/self-update-source)"
   primary_base="refs/remotes/$SELF_UPDATE_REMOTE/$SELF_UPDATE_BRANCH"
   if git -C "$FM_ROOT" fetch --quiet --no-tags "$SELF_UPDATE_REMOTE" \
@@ -257,7 +281,7 @@ fm_ff_after_secondmate_settled() {  # <id> <home> <window> <status> <instr>
 # The local secondmate target: origin by default, or the primary's resulting
 # default-branch commit under a configured self-update source (see header).
 secondmate_base=origin
-if [ -n "$SELF_UPDATE_REMOTE" ]; then
+if [ -n "$SELF_UPDATE_REMOTE" ] || [ -n "$SELF_UPDATE_LOCAL" ]; then
   if secondmate_base=$(primary_head_commit "$FM_ROOT"); then
     FF_IMPORT_FROM="$FM_ROOT"
   else

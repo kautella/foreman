@@ -6,8 +6,10 @@
 # prefix, "fm/" when the project registers none, is unregistered, or the registry
 # is absent, so every existing installation keeps its current "fm/<task-id>"
 # branch names unchanged.
-# With --forge it prints one word instead: the project's registered forge,
-# none|gerrit|forgejo|external. The forge is asked for explicitly, so the
+# With --forge it prints one word instead: the project's registered delivery provider,
+# none|github|gitlab|gerrit|forgejo|external. The legacy forge spelling remains
+# accepted for compatibility. With --provider it prints local|github|gitlab|gerrit|
+# forgejo|external, resolving local-only as local. The provider is asked for explicitly, so the
 # default output stays the same two words for every project, bound or not.
 # With --pr it prints one word: the project's registered PR-text posture,
 # auto|manual, "auto" when the project registers none.
@@ -30,6 +32,7 @@
 #   - <name> [<mode>] - <desc> (added <date>)                        -> <mode> off fm/
 #   - <name> [<mode> +yolo] - <desc> (added <date>)                  -> <mode> on fm/
 #   - <name> [<mode> +yolo branch=<prefix>] - <desc> (added <date>)  -> <mode> <yolo> <prefix>
+#   - <name> [<mode> provider=gitlab] - <desc> (added <date>)        -> <mode> off, --provider gitlab
 #   - <name> [<mode> forge=gerrit] - <desc> (added <date>)           -> <mode> off, --forge gerrit
 #   - <name> [<mode> forge=forgejo] - <desc> (added <date>)          -> <mode> <yolo>, --forge forgejo
 #   - <name> [direct-PR forge=external] - <desc> (added <date>)      -> direct-PR off, --forge external
@@ -110,7 +113,9 @@
 # tell a conditional policy apart from a flat mode sees "no-mistakes-prod-only"
 # itself. Not combined with --branch-prefix, which has no conditional-policy leg.
 #
-# An unknown/missing project or unknown mode falls back to "no-mistakes off" (or
+# An unknown/missing project falls back to the home delivery default. config/delivery-default
+# is local-only when absent, and may be publish-required to preserve the historic
+# no-mistakes default. Explicit registry rows always retain their historic meaning.
 # "fm/" under --branch-prefix) and warns to stderr, so a typo never silently
 # drops the gate. Other annotation tokens are ignored, as they always were, keyed
 # ones included: a `<key>=<value>` token whose key is none of `forge`, `branch`, and
@@ -128,33 +133,55 @@
 # to the forge binding, so it prints even when the forge token is malformed;
 # every path that reads the forge binding (default, --forge, and spawn's
 # forge-agreement check) still refuses.
-# Usage: fm-project-mode.sh [--raw|--branch-prefix|--forge|--pr] <project-name>
+# Usage: fm-project-mode.sh [--raw|--branch-prefix|--forge|--provider|--pr] <project-name>
 set -eu
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 FM_ROOT="${FM_ROOT_OVERRIDE:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 FM_HOME="${FM_HOME:-${FM_ROOT_OVERRIDE:-$FM_ROOT}}"
 DATA="${FM_DATA_OVERRIDE:-$FM_HOME/data}"
+CONFIG="${FM_CONFIG_OVERRIDE:-$FM_HOME/config}"
 REG="$DATA/projects.md"
 RAW=0
 BRANCH_PREFIX_QUERY=0
 WANT_FORGE=0
+WANT_PROVIDER=0
 WANT_PR=0
 case "${1:-}" in
   --raw) RAW=1; shift ;;
   --branch-prefix) BRANCH_PREFIX_QUERY=1; shift ;;
   --forge) WANT_FORGE=1; shift ;;
+  --provider) WANT_PROVIDER=1; shift ;;
   --pr) WANT_PR=1; shift ;;
 esac
-NAME=${1:?usage: fm-project-mode.sh [--raw|--branch-prefix|--forge|--pr] <project-name>}
+NAME=${1:?usage: fm-project-mode.sh [--raw|--branch-prefix|--forge|--provider|--pr] <project-name>}
+
+default_mode() {
+  local value
+  [ -e "$CONFIG/delivery-default" ] || { printf '%s\n' local-only; return; }
+  [ -f "$CONFIG/delivery-default" ] && [ -r "$CONFIG/delivery-default" ] || {
+    echo "refused: $CONFIG/delivery-default must be a readable regular file containing local-only or publish-required" >&2
+    return 3
+  }
+  value=$(tr -d '[:space:]' < "$CONFIG/delivery-default")
+  case "$value" in local-only) printf '%s\n' local-only ;; publish-required) printf '%s\n' no-mistakes ;; *)
+    echo "refused: $CONFIG/delivery-default must contain local-only or publish-required" >&2; return 3 ;;
+  esac
+}
+
+print_default() {
+  local mode
+  mode=$(default_mode) || return $?
+  if [ "$BRANCH_PREFIX_QUERY" -eq 1 ]; then echo "fm/"
+  elif [ "$WANT_FORGE" -eq 1 ]; then echo none
+  elif [ "$WANT_PROVIDER" -eq 1 ]; then [ "$mode" = local-only ] && echo local || echo github
+  elif [ "$WANT_PR" -eq 1 ]; then echo auto; else echo "$mode off"; fi
+}
 
 if [ ! -f "$REG" ]; then
-  echo "warn: no registry at $REG; defaulting $NAME to no-mistakes off" >&2
-  if [ "$BRANCH_PREFIX_QUERY" -eq 1 ]; then
-    echo "fm/"
-  elif [ "$WANT_FORGE" -eq 1 ]; then echo none
-  elif [ "$WANT_PR" -eq 1 ]; then echo auto; else echo "no-mistakes off"; fi
-  exit 0
+  echo "warn: no registry at $REG; defaulting $NAME through $CONFIG/delivery-default" >&2
+  print_default
+  exit $?
 fi
 
 # awk emits one "near <token>" line per keyed token whose key is a near miss of
@@ -188,7 +215,7 @@ parsed=$(awk -v n="$NAME" '
     if (substr($0, 1, plen) != prefix) next
     after = substr($0, plen + 1);
     if (after != "" && substr(after, 1, 2) != " [" && substr(after, 1, 3) != " - ") next
-    mode="no-mistakes"; yolo="off"; branch="fm/"; forge="none"; pr="auto";
+    mode="no-mistakes"; yolo="off"; branch="fm/"; forge="none"; provider="provider=none"; pr="auto";
     if (substr(after, 1, 2) == " [") {
       s="";
       nk = split(after, rest, " ");
@@ -204,6 +231,7 @@ parsed=$(awk -v n="$NAME" '
         if (a[j]=="+yolo") { yolo="on"; continue }
         if (a[j] ~ /^branch=/) { branch = substr(a[j], 8); continue }
         if (a[j] ~ /^forge=/) { forge = a[j]; continue }
+        if (a[j] ~ /^provider=/) { provider = a[j]; continue }
         if (a[j] ~ /^pr=/) { pr = a[j]; continue }
         if (a[j] ~ /^[^=]+=/) {
           key = substr(a[j], 1, index(a[j], "=") - 1);
@@ -217,17 +245,14 @@ parsed=$(awk -v n="$NAME" '
     }
     # branch is printed LAST: an empty branch= override must survive as an
     # empty final field, which only holds when nothing follows it.
-    print "posture", mode, yolo, forge, pr, branch; exit
+    print "posture", mode, yolo, forge, provider, pr, branch; exit
   }
 ' "$REG")
 
 if [ -z "$parsed" ]; then
-  echo "warn: project \"$NAME\" not in registry; defaulting to no-mistakes off" >&2
-  if [ "$BRANCH_PREFIX_QUERY" -eq 1 ]; then
-    echo "fm/"
-  elif [ "$WANT_FORGE" -eq 1 ]; then echo none
-  elif [ "$WANT_PR" -eq 1 ]; then echo auto; else echo "no-mistakes off"; fi
-  exit 0
+  echo "warn: project \"$NAME\" not in registry; defaulting through $CONFIG/delivery-default" >&2
+  print_default
+  exit $?
 fi
 
 posture=
@@ -239,12 +264,13 @@ while IFS=' ' read -r kind rest; do
 done <<EOF
 $parsed
 EOF
-while IFS=' ' read -r m y f p b; do
-  mode=$m; yolo=$y; rest_forge=$f; rest_pr=$p; branch=$b
+while IFS=' ' read -r m y f provider_token p b; do
+  mode=$m; yolo=$y; rest_forge=$f; rest_provider=$provider_token; rest_pr=$p; branch=$b
 done <<EOF
 $posture
 EOF
 forge=${rest_forge:-none}
+provider=${rest_provider:-provider=none}
 pr=${rest_pr:-auto}
 case "$mode" in
   no-mistakes|direct-PR|local-only|no-mistakes-prod-only) ;;
@@ -257,20 +283,42 @@ if [ "$BRANCH_PREFIX_QUERY" -eq 1 ]; then
 fi
 
 case "$forge" in
-  none|forge=gerrit|forge=forgejo|forge=external) forge=${forge#forge=} ;;
+  none|forge=gerrit|forge=forgejo|forge=external|forge=gitlab) forge=${forge#forge=} ;;
   forge=)
-    echo "refused: empty forge binding \"forge=\" registered for $NAME in $REG; the accepted values are forge=gerrit, forge=forgejo, and forge=external, or no forge token at all for a forge whose pull requests no-mistakes already drives; correct the registry entry" >&2
+    echo "refused: empty forge binding \"forge=\" registered for $NAME in $REG; use provider=local|github|gitlab|gerrit|forgejo|external; legacy forge=gerrit, forge=forgejo, forge=gitlab, and forge=external remain accepted" >&2
     exit 3 ;;
   *)
-    echo "refused: unknown forge \"${forge#forge=}\" registered for $NAME in $REG; the accepted values are forge=gerrit, forge=forgejo, and forge=external, or no forge token at all for a forge whose pull requests no-mistakes already drives; correct the registry entry" >&2
+    echo "refused: unknown forge \"${forge#forge=}\" registered for $NAME in $REG; use provider=local|github|gitlab|gerrit|forgejo|external" >&2
     exit 3 ;;
 esac
-if [ "$forge" != none ] && [ "$mode" = local-only ]; then
-  echo "refused: $NAME is registered local-only with forge=$forge in $REG; local-only publishes nothing, so a forge has no meaning there, and its landing would fast-forward local main with content the review server has never seen; register no-mistakes or direct-PR to publish through the forge, or drop the forge token to keep the project local" >&2
-  exit 3
+if [ "$provider" != provider=none ]; then
+  provider=${provider#provider=}
+  case "$provider" in local|github|gitlab|gerrit|forgejo|external) ;; *)
+    echo "refused: unknown provider '$provider' registered for $NAME in $REG; accepted values are local, github, gitlab, gerrit, forgejo, and external" >&2; exit 3 ;;
+  esac
+  if [ "$forge" != none ] && [ "$forge" != "$provider" ]; then
+    echo "refused: $NAME records conflicting provider=$provider and forge=$forge; migrate the legacy forge token or make both values agree" >&2; exit 3
+  fi
+  forge=$provider
+else
+  case "$mode:$forge" in local-only:none) provider=local ;; *:none) provider=github ;; *) provider=$forge ;; esac
+fi
+if [ "$provider" = local ] && [ "$mode" != local-only ]; then
+  echo "refused: $NAME records provider=local with mode=$mode; local provider ships only local-only" >&2; exit 3
+fi
+if [ "$provider" != local ] && [ "$mode" = local-only ]; then
+  echo "refused: $NAME records provider=$provider with local-only; local-only has provider=local and publishes nothing" >&2; exit 3
 fi
 if [ "$WANT_FORGE" -eq 1 ]; then
-  echo "$forge"
+  if [ "$rest_provider" = provider=none ]; then
+    echo "$forge"
+  else
+    [ "$provider" = local ] && echo none || echo "$provider"
+  fi
+  exit 0
+fi
+if [ "$WANT_PROVIDER" -eq 1 ]; then
+  echo "$provider"
   exit 0
 fi
 

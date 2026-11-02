@@ -14,7 +14,7 @@
 # charters still use a single `{TASK}` charter fill. Firstmate may adjust other
 # sections when the task genuinely deviates (e.g. working an existing external
 # PR instead of shipping a new one).
-# Usage: fm-brief.sh <task-id> <repo-name> --mode <no-mistakes|direct-PR|local-only> [--branch-prefix <prefix>] [--base-branch <branch>] [--forge <none|gerrit|forgejo|external> [--shape squash]] [--pr <auto|manual>] [--herdr-lab]
+# Usage: fm-brief.sh <task-id> <repo-name> --mode <no-mistakes|direct-PR|local-only> [--branch-prefix <prefix>] [--base-branch <branch>] [--forge <none|github|gitlab|gerrit|forgejo|external> [--shape squash]] [--pr <auto|manual>] [--herdr-lab]
 #        fm-brief.sh <task-id> <repo-name> --scout [--base-branch <branch>] [--herdr-lab]
 #        fm-brief.sh <task-id> --secondmate {<project>...|--no-projects}
 #   --scout writes the scout contract instead: the deliverable is a report at
@@ -335,8 +335,10 @@ if [ "$KIND" = ship ]; then
   fi
   # A Forgejo project's pull requests are handled with tea, so the ship brief's
   # forge-CLI rule names it instead of gh-axi; an external review tool has no
-  # forge CLI at all; every other forge keeps gh-axi.
-  if [ "$FORGE" = forgejo ]; then
+  # forge CLI at all; GitLab uses glab through the explicit provider helper.
+  if [ "$FORGE" = gitlab ]; then
+    FORGE_RULE_LINE="Use glab only through bin/fm-review-provider.sh for GitLab operations and chrome-devtools-axi for browser operations."
+  elif [ "$FORGE" = forgejo ]; then
     FORGE_RULE_LINE="Use tea for Forgejo operations and chrome-devtools-axi for browser operations."
   elif [ "$FORGE" = external ]; then
     FORGE_RULE_LINE="Publish only through the review tool your Definition of done names, and use chrome-devtools-axi for browser operations."

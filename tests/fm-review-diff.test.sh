@@ -380,9 +380,8 @@ test_forgejo_pr_url_falls_back_to_recorded_head() {
   pass "fm-review-diff falls back to a recorded Forgejo pr_head when the pull ref cannot be fetched"
 }
 
-# Without the opt-in a remote-backed project keeps the origin/<default> anchor
-# whatever the task's delivery, as before.
-test_default_review_stays_on_origin_without_the_opt_in() {
+# Local-only review is local-first even when an archival origin remains.
+test_local_only_review_stays_on_local_default_without_opt_in() {
   local case_dir out
   case_dir=$(seed_case default-origin-anchor)
   land_locally "$case_dir" 1 2 3
@@ -391,11 +390,11 @@ test_default_review_stays_on_origin_without_the_opt_in() {
 
   out=$(run_review_diff "$case_dir" task-x1 --stat 2> "$case_dir/stderr")
 
-  assert_contains "$out" 'diff base: origin/main' "default-origin-anchor: the default anchor must stay origin/<default>"
+  assert_contains "$out" 'diff base: main' "default-origin-anchor: local-only must anchor on local main"
   assert_contains "$out" 'task-change.txt' "default-origin-anchor: the task's own change must be in the diff"
-  assert_contains "$out" 'landed-1.txt' "default-origin-anchor: the default review must not move off origin's anchor"
+  assert_not_contains "$out" 'landed-1.txt' "default-origin-anchor: local-only review must exclude earlier local landings"
   assert_not_contains "$(cat "$case_dir/stderr")" 'note:' "default-origin-anchor: the default review must print no anchor note"
-  pass "fm-review-diff keeps anchoring a remote-backed project on origin without the opt-in"
+  pass "fm-review-diff anchors local-only review on local main without fetching origin"
 }
 
 test_opted_in_local_landing_reviews_against_the_local_default() {
@@ -466,9 +465,9 @@ test_opted_in_rebased_branch_reviews_only_its_own_work() {
   pass "fm-review-diff follows an opted-in local-only branch through its rebase and later landings"
 }
 
-# The mirror case: origin advanced and the primary checkout never pulled, so the
-# local default trails the origin tip the task was planted on.
-test_opted_in_trailing_local_default_keeps_origin() {
+# Local-only never changes review base to origin, including when an archival
+# remote is ahead of the local delivery branch.
+test_local_only_trailing_local_default_stays_local() {
   local case_dir out
   case_dir=$(seed_case trailing-primary)
   opt_in_review_anchor "$case_dir"
@@ -478,10 +477,10 @@ test_opted_in_trailing_local_default_keeps_origin() {
 
   out=$(run_review_diff "$case_dir" task-x1 --stat 2> "$case_dir/stderr")
 
-  assert_contains "$out" 'diff base: origin/main' "trailing: a local default behind the planted base must not become the anchor"
+  assert_contains "$out" 'diff base: main' "trailing: local-only must remain anchored on the local delivery branch"
   assert_contains "$out" 'task-change.txt' "trailing: the task's own change must be in the diff"
-  assert_not_contains "$out" 'upstream-' "trailing: origin's commits must stay out of the review"
-  pass "fm-review-diff keeps an opted-in review on origin when the local default trails it"
+  assert_contains "$out" 'upstream-' "trailing: a branch based on origin must visibly show its unlanded base commits"
+  pass "fm-review-diff keeps local-only review offline when local main trails origin"
 }
 
 test_opted_in_diverged_defaults_anchor_where_the_task_was_planted() {
@@ -493,21 +492,16 @@ test_opted_in_diverged_defaults_anchor_where_the_task_was_planted() {
     push_to_origin_only "$case_dir" 1
     plant_task_branch "$case_dir" "$planted"
     write_task_meta "$case_dir" "kind=ship" "mode=local-only"
-    if [ "$planted" = main ]; then
-      expected=main
-      foreign=upstream-1.txt
-    else
-      expected=origin/main
-      foreign=landed-1.txt
-    fi
+    expected=main
+    foreign=landed-1.txt
 
     out=$(run_review_diff "$case_dir" task-x1 --stat 2> "$case_dir/stderr")
 
     assert_contains "$out" "diff base: $expected" "diverged-$planted: the anchor must be the branch the task was planted on"
     assert_contains "$out" 'task-change.txt' "diverged-$planted: the task's own change must be in the diff"
-    assert_not_contains "$out" "$foreign" "diverged-$planted: a commit only the other branch carries must stay out"
+    assert_not_contains "$out" "$foreign" "diverged-$planted: a locally landed commit must stay out"
   done
-  pass "fm-review-diff anchors opted-in diverged default branches on the one the task was planted on"
+  pass "fm-review-diff anchors local-only diverged branches on local main"
 }
 
 test_opted_in_landed_branch_reports_an_empty_review() {
@@ -541,8 +535,8 @@ test_opted_in_unrelated_merge_bases_are_reported() {
   out=$(run_review_diff "$case_dir" task-x1 --stat 2> "$case_dir/stderr")
 
   assert_contains "$out" 'diff base: main' "unrelated-bases: with no tighter anchor the review takes the local default"
-  assert_contains "$(cat "$case_dir/stderr")" 'unrelated commits' "unrelated-bases: the undecidable pair must be reported"
-  pass "fm-review-diff reports opted-in unrelated merge bases instead of choosing one silently"
+  assert_not_contains "$(cat "$case_dir/stderr")" 'unrelated commits' "unrelated-bases: local-only must not inspect origin to choose its base"
+  pass "fm-review-diff ignores an unrelated archival origin for local-only review"
 }
 
 # A named base branch is delivered against origin, so the opt-in leaves its
@@ -582,11 +576,11 @@ test_recorded_base_branch_is_the_review_base
 test_forgejo_pr_url_fetches_pull_head
 test_forgejo_repo_named_pulls_resolves_by_last_segment
 test_forgejo_pr_url_falls_back_to_recorded_head
-test_default_review_stays_on_origin_without_the_opt_in
+test_local_only_review_stays_on_local_default_without_opt_in
 test_opted_in_local_landing_reviews_against_the_local_default
 test_opted_in_publishing_mode_stays_on_origin
 test_opted_in_rebased_branch_reviews_only_its_own_work
-test_opted_in_trailing_local_default_keeps_origin
+test_local_only_trailing_local_default_stays_local
 test_opted_in_diverged_defaults_anchor_where_the_task_was_planted
 test_opted_in_landed_branch_reports_an_empty_review
 test_opted_in_unrelated_merge_bases_are_reported

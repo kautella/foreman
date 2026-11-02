@@ -42,7 +42,8 @@ Choose that posture when adding or creating the project:
 - `local-only` has no required remote or PR and lands only through the approved local fast-forward path.
 - `no-mistakes-prod-only` is a conditional policy rather than one flat mode: genuinely internal-only tooling, automation, contributor or operator process, and release or submission work ships `direct-PR`, while product-facing, mixed, and uncertain work ships `no-mistakes`.
 
-`no-mistakes-prod-only` is the default for a newly added or created remote-backed project when the captain specifies nothing, and a project with no remote defaults to `local-only`.
+`local-only` is the home default for unregistered work and newly initialized projects unless `config/delivery-default` explicitly contains `publish-required`.
+A remote never changes that decision.
 State that resolved default while confirming the source, local name, and posture instead of asking the captain to choose from scratch, and record a flat mode instead whenever they ask for one.
 Existing registry entries keep the meaning they already have and are never migrated or reinterpreted, so a legacy entry with no bracket stays `no-mistakes`.
 Registering a conditional policy is a one-time choice and never requires classifying any change; the per-task surface classification happens at each task's intake, and internal-only is never inferred from file location or project name.
@@ -51,7 +52,8 @@ The optional `+yolo` posture changes merge authority only and does not change th
 Default it off for every project and every posture, and enable it only on the captain's explicit instruction.
 `AGENTS.md` section 7 owns the merge-authority contract.
 
-The optional `forge=` token records which forge the project's remote actually is; its values are `forge=gerrit`, `forge=forgejo`, and `forge=external`.
+The optional `provider=` token records the explicit delivery provider: `local`, `github`, `gitlab`, `gerrit`, `forgejo`, or `external`.
+Legacy `forge=` rows remain readable and may be migrated only after review with `bin/fm-project-migrate-provider.sh --dry-run` followed by `--apply`.
 It is orthogonal to the mode and to `+yolo`, so it is never derived from either, and it is never inferred at use time from a remote name, host, port, or push target.
 At add or create intake, run `bin/fm-forge-detect.sh projects/<name>` once the clone exists and propose its answer alongside the posture; the captain's confirmation is what binds it, and the registry token is the durable record of that confirmation.
 Never register the binding from detection alone, and never re-derive it later from the clone.
@@ -66,8 +68,9 @@ The optional `pr=manual` token marks a `no-mistakes` project whose PR title and 
 
 Confirm the source URL, local project name, delivery posture, and autonomy posture, stating the resolved default for each rather than asking the captain to invent one.
 Clone into `projects/<name>` and add the registry entry only after the destination is known to be unused.
-A `no-mistakes` or `no-mistakes-prod-only` project must have an `origin` remote and must complete the initialization procedure below, because a conditional policy's product-facing work runs the pipeline while its internal-only work still takes the direct PR.
-A `direct-PR` project needs an `origin` remote but skips no-mistakes initialization.
+A publishing project needs its explicitly selected publication target configured.
+A `no-mistakes` or `no-mistakes-prod-only` project must complete the initialization procedure below.
+A `direct-PR` project skips no-mistakes initialization.
 A `local-only` project may have no remote and skips no-mistakes initialization.
 Confirm the matching CLI is authenticated for a non-GitHub host: `glab auth login` for a GitLab project, whose merge watch and merge use glab, or a `tea login add` for a `forge=forgejo` project, whose merge watch, merge, and generated ship brief use tea.
 
