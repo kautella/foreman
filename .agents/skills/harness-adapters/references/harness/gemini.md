@@ -2,7 +2,8 @@
 
 Google's `gemini` TUI, verified end to end on 2026-09-04 with gemini-cli 0.58.0 on Linux.
 Launch shape: `GEMINI_CLI_TRUST_WORKSPACE=true gemini -y "$(cat <brief>)"`.
-Verified as a CREWMATE and SCOUT adapter only; `../../../../../bin/fm-spawn.sh` refuses a secondmate launch on it because `../../../../../docs/supervision-protocols/` carries no gemini wake protocol.
+Verified as a CREWMATE and SCOUT adapter, with an enterprise-host primary hook preview pending live validation.
+Gemini remains refused for secondmates because the primary adapter has no persistent-home recovery contract.
 
 ## Operating facts
 
@@ -103,7 +104,13 @@ Gemini does NOT read `.claude/skills`.
 
 ## Primary integration
 
-Unsupported and unverified.
-`../../../../../docs/supervision-protocols/` carries no gemini protocol, no turn-end guard adapter exists for it, and this adapter verified only the crewmate-side launch, busy state, interrupt, and exit.
-`references/common/primary-hooks.md`'s unsupported-boundary rule applies: never invent a wake protocol from a similar TUI.
-Gemini's `BeforeAgent`/`AfterAgent` pair and its `gemini hooks migrate` command make a future primary integration plausible, but it remains unbuilt work, not a fact to rely on.
+Install the guarded user-level hooks documented in `../../../../../docs/gemini-primary.md`, then start `gemini` from the Firstmate checkout.
+Gemini 0.66.0 rejects a generated user-owned `GEMINI_CLI_SYSTEM_SETTINGS_PATH`, so the configuration is intentionally user-owned rather than written into the project or Firstmate state.
+
+Its `BeforeAgent` hook runs the Firstmate session-start path and returns that digest as `additionalContext`.
+Its `AfterAgent` hook waits on `bin/fm-watch-arm.sh` while supervision is required.
+An actionable watcher close prints the wake on stderr and exits 2, so Gemini starts one retry turn with that context.
+That retry's `stop_hook_active` flag is allowed through, bounding the adapter to one automatic handling turn before the next ordinary turn boundary parks again.
+
+This integration requires a Gemini version whose hooks honor command-hook JSON responses and exit-2 retry turns.
+Run `tests/fm-gemini-primary.test.sh` for the hermetic launch contract and the opt-in live primary test before treating a new Gemini release as verified.

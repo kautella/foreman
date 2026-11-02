@@ -79,6 +79,13 @@ Cursor Agent CLI is verified as a primary too, using a tracked project-scope `.c
 Launch it with `--trust`, or none of its project hooks load; it also has no turn-end hook in headless `cursor-agent -p`, so run the primary session interactively.
 Antigravity CLI (`agy`) is verified as a primary too, using a tracked project-local `.agents/hooks.json` whose Stop hook parks on the watcher between turns like Cursor's.
 
+**Gemini CLI**
+
+Configure the guarded Gemini hooks in your user `~/.gemini/settings.json`, then start `gemini` from this checkout.
+The hook verifies Gemini's current directory before it acts, so it leaves ordinary Gemini projects alone.
+See [Gemini primary setup](docs/gemini-primary.md).
+This integration is an enterprise-host preview until its live validation completes.
+
 ### Install and launch
 
 ```sh
