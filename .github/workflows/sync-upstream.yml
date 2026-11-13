@@ -20,11 +20,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Merge Firstmate main
+      - name: Rebase fork changes onto Firstmate main
         run: |
           git remote add upstream https://github.com/kunchenguid/firstmate.git
           git fetch upstream main
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git merge --no-edit upstream/main
-          git push origin HEAD:main
+          git rebase upstream/main
+          git push --force-with-lease origin HEAD:main
