@@ -154,6 +154,19 @@ test_bun_run_omp_is_identified_on_both_platforms() {
   pass "session-lock: a bun-run omp script is identified under both platforms' comm reporting"
 }
 
+test_node_run_gemini_is_identified() {
+  local fakebin
+  fakebin=$(fm_fakebin "$TMP_ROOT/node-gemini")
+  lib_eval "$fakebin" "fm_harness_process_matches node 'node --max-old-space-size=10000 /opt/homebrew/bin/gemini'" \
+    || fail "a Node-run Gemini launcher was not identified"
+  lib_eval "$fakebin" "fm_harness_process_matches MainThread 'node /opt/homebrew/lib/node_modules/@google/gemini-cli/dist/index.js'" \
+    || fail "a MainThread Gemini package was not identified"
+  if lib_eval "$fakebin" "fm_harness_process_matches node 'node /repo/bin/not-gemini.js'"; then
+    fail "an unrelated Node script was identified as Gemini"
+  fi
+  pass "session-lock: Node-run Gemini is identified from its launcher or package path"
+}
+
 test_ordinary_paths_are_never_harness_processes() {
   local dir fakebin shape
   dir="$TMP_ROOT/ordinary-paths"
@@ -1660,6 +1673,7 @@ test_reanchor_keeps_autoarm_midturn_healthy() {
 test_version_named_session_is_identified_on_both_platforms
 test_harness_at_namespace_pid1_is_examined
 test_bun_run_omp_is_identified_on_both_platforms
+test_node_run_gemini_is_identified
 test_ordinary_paths_are_never_harness_processes
 test_harness_beyond_a_gap_never_owns_the_lock
 test_competing_version_named_session_is_seen_as_live

@@ -27,6 +27,8 @@ _FM_SESSION_LOCK_LIB_DIR=${BASH_SOURCE[0]%/*}
 . "${_FM_SESSION_LOCK_LIB_DIR:-/}/fm-cursor-lib.sh"
 # shellcheck source=bin/fm-omp-process-lib.sh
 . "${_FM_SESSION_LOCK_LIB_DIR:-/}/fm-omp-process-lib.sh"
+# shellcheck source=bin/fm-gemini-lib.sh
+. "${_FM_SESSION_LOCK_LIB_DIR:-/}/fm-gemini-lib.sh"
 unset _FM_SESSION_LOCK_LIB_DIR
 
 # Known harness command names; extend when a new adapter is verified. omp and
@@ -110,6 +112,8 @@ fm_ps_ppid() {  # <pid> -> parent pid
 #   4. Cursor's own structural identity, owned by bin/fm-cursor-lib.sh.
 #   5. omp's structural identity, owned by bin/fm-omp-process-lib.sh, which
 #      also covers the bun-package install whose process name is `bun`.
+#   6. Gemini's structural identity, owned by bin/fm-gemini-lib.sh, because
+#      its command name may be a Node interpreter or MainThread.
 FM_HARNESS_IS_CLAUDE=0
 fm_harness_process_matches() {  # <comm> <args>
   local comm=$1 args=$2 base argv0 name
@@ -139,6 +143,9 @@ fm_harness_process_matches() {  # <comm> <args>
   # fleet lock as read-only and the park can never arm.
   fm_cursor_process_matches "$comm" "$args" "$argv0" && return 0
   fm_omp_process_matches "$comm" "$args" && return 0
+  fm_gemini_path_is_gemini "$comm" && return 0
+  fm_gemini_path_is_gemini "$argv0" && return 0
+  fm_gemini_args_are_gemini "$args" && return 0
   return 1
 }
 
